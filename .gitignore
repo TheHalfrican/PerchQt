@@ -1,0 +1,29 @@
+# Build outputs
+/build/
+/CMakeFiles/
+/CMakeCache.txt
+/*.cbp
+/*.user
+Makefile
+cmake_install.cmake
+install_manifest.txt
+
+# Qt Creator
+*.autosave
+*.user
+*.pro.user*
+*.qmake.stash
+*.qmake.super
+
+# Qt moc/rcc/uic generated files
+moc_*.cpp
+moc_*.h
+ui_*.h
+qrc_*.cpp
+
+# macOS
+.DS_Store
+
+# Backup files
+*~
+*.swp

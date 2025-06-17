@@ -1,0 +1,25 @@
+// .vscode/c_cpp_properties.json
+{
+  "configurations": [
+    {
+      "name": "macOS",
+      "compilerPath": "/usr/bin/clang",
+      "intelliSenseMode": "macos-clang-x64",
+      "cStandard":   "c17",
+      "cppStandard": "c++17",
+      "includePath": [
+        "${workspaceFolder}/src",
+        // Qt headers (adjust if your prefix is different)
+        "/opt/homebrew/opt/qt/include",
+        "/opt/homebrew/opt/qt/include/QtCore",
+        "/opt/homebrew/opt/qt/include/QtGui",
+        "/opt/homebrew/opt/qt/include/QtWidgets"
+      ],
+      "macFrameworkPath": [
+        "/Library/Frameworks",
+        "/System/Library/Frameworks"
+      ]
+    }
+  ],
+  "version": 4
+}
