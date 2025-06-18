@@ -1,0 +1,12 @@
+<RCC>
+  <qresource prefix="/assets">
+    <file>app_icon.icns</file>
+    <file>app_icon.ico</file>
+    <file>app_icon.png</file>
+    <file>controller_config_icon.png</file>
+    <file>grid_icon.png</file>
+    <file>list_icon.png</file>
+    <file>settings_icon.png</file>
+    <file>tag_icon.png</file>
+  </qresource>
+</RCC>

@@ -1,5 +1,3 @@
-
-
 #include "ViewModels/GameListViewModel.h"
 #include "Models/GameListModel.h"
 #include "Models/Game.h"
@@ -10,6 +8,8 @@
 #include <QtSql/QSqlError>
 #include <QVariant>
 #include <QDebug>
+#include <QtCore/QDateTime>
+#include <QtCore/QProcess>
 
 GameListViewModel::GameListViewModel(QObject* parent)
     : QObject(parent)
@@ -68,7 +68,62 @@ void GameListViewModel::onGameSelected(const QModelIndex& index)
     if (!index.isValid())
         return;
 
-    // Retrieve the selected game and emit the launch signal
+    // Retrieve the selected game
     Game game = m_model->gameAt(index.row());
+
+    // Launch the game executable
+    QString executable = game.filePath;
+    if (!QProcess::startDetached(executable)) {
+        qWarning() << "Failed to launch game:" << executable;
+        return;
+    }
+
+    // Update lastPlayed and playCount
+    QDateTime now = QDateTime::currentDateTime();
+    game.lastPlayed = now.toString(Qt::ISODate);
+    game.playCount += 1;
+
+    // Write update back to the database
+    QSqlQuery updateQuery;
+    updateQuery.prepare(R"(
+        UPDATE games
+           SET last_played = :lastPlayed,
+               play_count   = :playCount
+         WHERE id           = :id
+    )");
+    updateQuery.bindValue(":lastPlayed", game.lastPlayed);
+    updateQuery.bindValue(":playCount", game.playCount);
+    updateQuery.bindValue(":id", game.id);
+    if (!updateQuery.exec()) {
+        qWarning() << "Failed to update game record:" << updateQuery.lastError().text();
+    }
+
+    // Refresh the model to show updated values
+    loadGames();
+
+    // Emit the signal with the updated game
     emit gameLaunched(game);
+}
+
+void GameListViewModel::addGame(const QString& title,
+                                const QString& filePath,
+                                const QString& coverPath)
+{
+    QSqlQuery insert;
+    insert.prepare(R"(
+        INSERT INTO games(title, file_path, cover_path, last_played, play_count)
+             VALUES(:title, :filePath, :coverPath, :lastPlayed, :playCount)
+    )");
+    insert.bindValue(":title", title);
+    insert.bindValue(":filePath", filePath);
+    insert.bindValue(":coverPath", coverPath);
+    insert.bindValue(":lastPlayed", QString());
+    insert.bindValue(":playCount", 0);
+    if (!insert.exec()) {
+        qWarning() << "Failed to insert game:" << insert.lastError().text();
+        return;
+    }
+
+    // Reload model to include the new entry
+    loadGames();
 }

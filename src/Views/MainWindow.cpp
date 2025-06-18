@@ -1,48 +1,51 @@
-
-
 #include "Views/MainWindow.h"
+#include "ui_MainWindow.h"
 #include "ViewModels/GameListViewModel.h"
 
-#include <QListView>
-#include <QWidget>
-#include <QVBoxLayout>
+#include <QFileDialog>
+#include <QFileInfo>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
+    , ui(new Ui::MainWindow)
     , m_viewModel(new GameListViewModel(this))
-    , m_listView(new QListView(this))
 {
-    setupUi();
-    setupConnections();
-    // Load games (adjust config path logic in ViewModel as needed)
+    ui->setupUi(this);
+
+    // Hook up the model
+    ui->listView->setModel(m_viewModel->gameListModel());
+
+    // Connect signals
+    connect(ui->listView, &QListView::clicked,
+            m_viewModel, &GameListViewModel::onGameSelected);
+    connect(ui->actionAddGame, &QAction::triggered,
+            this, &MainWindow::onAddGameClicked);
+
+    // Load games
     m_viewModel->loadGames();
 }
 
-MainWindow::~MainWindow() = default;
-
-void MainWindow::setupUi()
+MainWindow::~MainWindow()
 {
-    setWindowTitle("PerchQt");
-
-    // Central widget and layout
-    auto* central = new QWidget(this);
-    auto* layout  = new QVBoxLayout(central);
-    layout->addWidget(m_listView);
-    setCentralWidget(central);
-
-    // Set the model on the list view
-    m_listView->setModel(m_viewModel->gameListModel());
+    delete ui;
 }
 
-void MainWindow::setupConnections()
+void MainWindow::onAddGameClicked()
 {
-    // When an item is clicked, notify the ViewModel
-    connect(m_listView, &QListView::clicked,
-            m_viewModel, &GameListViewModel::onGameSelected);
+    // Let user pick the executable file
+    QString filePath = QFileDialog::getOpenFileName(this,
+                                                    "Select Executable");
+    if (filePath.isEmpty())
+        return;
 
-    // Example: handle gameLaunched signal
-    // connect(m_viewModel, &GameListViewModel::gameLaunched,
-    //         this, [](const Game& game) {
-    //             // TODO: implement game launch handling
-    //         });
+    // Derive title from filename without extension
+    QFileInfo fi(filePath);
+    QString title = fi.baseName();
+
+    // Let user pick an optional cover image
+    QString coverPath = QFileDialog::getOpenFileName(this,
+                                                     "Select Cover Image");
+
+    // Delegate to ViewModel
+    m_viewModel->addGame(title, filePath, coverPath);
 }

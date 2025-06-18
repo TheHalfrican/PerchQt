@@ -4,6 +4,10 @@ project(PerchQt VERSION 0.1 LANGUAGES CXX)
 # Enable Qt auto-moc, auto-uic, and auto-rcc
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTOUIC ON)
+# Tell AUTOUIC where to find .ui files under src/UI
+set(CMAKE_AUTOUIC_SEARCH_PATHS
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/UI"
+)
 set(CMAKE_AUTORCC ON)
 
 # Require C++17
@@ -21,6 +25,8 @@ add_executable(PerchQt
     src/ViewModels/GameListViewModel.cpp
     src/Views/MainWindow.cpp
     src/Views/GameWidgetView.cpp
+    src/UI/MainWindow.ui
+    src/Assets/resources.qrc
 )
 
 # Include header directories

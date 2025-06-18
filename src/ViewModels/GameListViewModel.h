@@ -5,6 +5,7 @@
 #include <QAbstractListModel>
 #include <QModelIndex>
 #include "Models/Game.h"
+#include <QString>
 
 // Forward declarations
 class GameListModel;
@@ -25,6 +26,11 @@ public:
 
     // Handle selection from the view
     Q_INVOKABLE void onGameSelected(const QModelIndex& index);
+
+    // Add a new game to the database and model
+    Q_INVOKABLE void addGame(const QString& title,
+                             const QString& filePath,
+                             const QString& coverPath);
 
 signals:
     // Emitted when a game should be launched
