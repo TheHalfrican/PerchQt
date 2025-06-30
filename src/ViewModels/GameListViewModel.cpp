@@ -61,6 +61,7 @@ void GameListViewModel::loadGames()
 
     // 4) Update the model
     m_model->setGames(games);
+    emit gamesChanged(games);
 }
 
 void GameListViewModel::onGameSelected(const QModelIndex& index)

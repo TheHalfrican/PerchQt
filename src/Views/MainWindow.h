@@ -3,6 +3,8 @@
 
 #include <QMainWindow>
 #include "ui_MainWindow.h"
+#include <QVector>
+#include "Models/Game.h"
 
 // Forward declarations
 class GameListViewModel;
@@ -22,6 +24,7 @@ private:
 
 private slots:
     void onAddGameClicked();
+    void onGamesLoaded(const QVector<Game>& games);
 };
 
 #endif // PERCHQT_MAINWINDOW_H

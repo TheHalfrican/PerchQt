@@ -2,26 +2,20 @@
 #define PERCHQT_GAMEWIDGETVIEW_H
 
 #include <QWidget>
-
-// Forward declarations
-class QLabel;
-class QVBoxLayout;
+#include "ui_GameWidgetView.h"
 
 class GameWidgetView : public QWidget {
     Q_OBJECT
 
 public:
     explicit GameWidgetView(QWidget* parent = nullptr);
+    ~GameWidgetView() override;
 
-    // Set the displayed game title
     void setTitle(const QString& title);
-    // Set the displayed cover art image
     void setCoverArt(const QString& coverArtPath);
 
 private:
-    QLabel*      m_coverArtLabel{nullptr};
-    QLabel*      m_titleLabel{nullptr};
-    QVBoxLayout* m_layout{nullptr};
+    Ui::GameWidgetView* ui{nullptr};
 };
 
 #endif // PERCHQT_GAMEWIDGETVIEW_H

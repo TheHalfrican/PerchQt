@@ -4,6 +4,7 @@
 #include <QObject>
 #include <QAbstractListModel>
 #include <QModelIndex>
+#include <QVector>
 #include "Models/Game.h"
 #include <QString>
 
@@ -35,6 +36,9 @@ public:
 signals:
     // Emitted when a game should be launched
     void gameLaunched(const Game& game);
+
+    // Emitted when the list of games has been updated
+    void gamesChanged(const QVector<Game>& games);
 
 private:
     GameListModel* m_model{nullptr};

@@ -2,6 +2,10 @@
 #include "ui_MainWindow.h"
 #include "ViewModels/GameListViewModel.h"
 
+#include "Views/GameWidgetView.h"
+#include "Models/Game.h"
+#include <QLayoutItem>
+
 #include <QFileDialog>
 #include <QFileInfo>
 
@@ -20,6 +24,11 @@ MainWindow::MainWindow(QWidget* parent)
             m_viewModel, &GameListViewModel::onGameSelected);
     connect(ui->actionAddGame, &QAction::triggered,
             this, &MainWindow::onAddGameClicked);
+
+    connect(m_viewModel,
+            &GameListViewModel::gamesChanged,
+            this,
+            &MainWindow::onGamesLoaded);
 
     // Load games
     m_viewModel->loadGames();
@@ -48,4 +57,30 @@ void MainWindow::onAddGameClicked()
 
     // Delegate to ViewModel
     m_viewModel->addGame(title, filePath, coverPath);
+}
+
+void MainWindow::onGamesLoaded(const QVector<Game>& games)
+{
+    // Clear existing items from the grid
+    QLayoutItem* item;
+    while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
+        if (QWidget* w = item->widget())
+            w->deleteLater();
+        delete item;
+    }
+
+    // Populate grid with new GameWidgetViews
+    const int columns = 3;
+    int row = 0;
+    int col = 0;
+    for (const Game& g : games) {
+        auto* view = new GameWidgetView(this);
+        view->setTitle(g.title);
+        view->setCoverArt(g.coverPath);
+        ui->gridLayout->addWidget(view, row, col);
+        if (++col >= columns) {
+            col = 0;
+            ++row;
+        }
+    }
 }

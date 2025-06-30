@@ -1,31 +1,26 @@
 #include "Views/GameWidgetView.h"
-#include <QLabel>
-#include <QVBoxLayout>
+#include "ui_GameWidgetView.h"
 #include <QPixmap>
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
-    , m_coverArtLabel(new QLabel(this))
-    , m_titleLabel(new QLabel(this))
-    , m_layout(new QVBoxLayout(this))
+    , ui(new Ui::GameWidgetView)
 {
-    // Configure labels
-    m_coverArtLabel->setAlignment(Qt::AlignCenter);
-    m_titleLabel->setAlignment(Qt::AlignCenter);
+    ui->setupUi(this);
+}
 
-    // Assemble layout
-    m_layout->addWidget(m_coverArtLabel);
-    m_layout->addWidget(m_titleLabel);
-    setLayout(m_layout);
+GameWidgetView::~GameWidgetView()
+{
+    delete ui;
 }
 
 void GameWidgetView::setTitle(const QString& title)
 {
-    m_titleLabel->setText(title);
+    ui->title_label->setText(title);
 }
 
 void GameWidgetView::setCoverArt(const QString& coverArtPath)
 {
     QPixmap pixmap(coverArtPath);
-    m_coverArtLabel->setPixmap(pixmap);
+    ui->cover_label->setPixmap(pixmap);
 }

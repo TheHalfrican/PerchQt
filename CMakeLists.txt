@@ -27,6 +27,7 @@ add_executable(PerchQt
     src/Views/GameWidgetView.cpp
     src/UI/MainWindow.ui
     src/Assets/resources.qrc
+    src/UI/GameWidgetView.ui
 )
 
 # Include header directories
