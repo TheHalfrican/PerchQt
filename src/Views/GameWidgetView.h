@@ -17,6 +17,10 @@ public:
     void setGame(const Game& game);
 
 signals:
+    void launchRequested(int gameId);
+    void showFileRequested(int gameId);
+    void setCoverRequested(int gameId);
+    void removeCoverRequested(int gameId);
     void removeRequested(int gameId);
 
 protected:

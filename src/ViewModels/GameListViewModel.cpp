@@ -10,6 +10,10 @@
 #include <QDebug>
 #include <QtCore/QDateTime>
 #include <QtCore/QProcess>
+#include <QDesktopServices>
+#include <QUrl>
+#include <QProcess>
+#include <QFileInfo>
 
 GameListViewModel::GameListViewModel(QObject* parent)
     : QObject(parent)
@@ -151,5 +155,63 @@ void GameListViewModel::removeGame(int gameId)
         return;
     }
     // Reload model to reflect deletion
+    loadGames();
+}
+
+void GameListViewModel::launchGame(int gameId)
+{
+    QSqlQuery query(QSqlDatabase::database());
+    query.prepare("SELECT file_path FROM games WHERE id = ?");
+    query.addBindValue(gameId);
+    if (!query.exec() || !query.next()) {
+        qWarning() << "Failed to retrieve file path for game ID" << gameId
+                   << ":" << query.lastError().text();
+        return;
+    }
+    QString path = query.value(0).toString();
+    if (!QProcess::startDetached(path)) {
+        qWarning() << "Failed to launch game executable:" << path;
+    }
+}
+
+void GameListViewModel::showGameFile(int gameId)
+{
+    QSqlQuery query(QSqlDatabase::database());
+    query.prepare("SELECT file_path FROM games WHERE id = ?");
+    query.addBindValue(gameId);
+    if (!query.exec() || !query.next()) {
+        qWarning() << "Failed to retrieve file path for game ID" << gameId
+                   << ":" << query.lastError().text();
+        return;
+    }
+    QString path = query.value(0).toString();
+    QFileInfo fi(path);
+    QDesktopServices::openUrl(QUrl::fromLocalFile(fi.absolutePath()));
+}
+
+void GameListViewModel::setCoverImage(int gameId, const QString& coverPath)
+{
+    QSqlQuery query(QSqlDatabase::database());
+    query.prepare("UPDATE games SET cover_path = ? WHERE id = ?");
+    query.addBindValue(coverPath);
+    query.addBindValue(gameId);
+    if (!query.exec()) {
+        qWarning() << "Failed to set cover image for game ID" << gameId
+                   << ":" << query.lastError().text();
+        return;
+    }
+    loadGames();
+}
+
+void GameListViewModel::removeCoverImage(int gameId)
+{
+    QSqlQuery query(QSqlDatabase::database());
+    query.prepare("UPDATE games SET cover_path = '' WHERE id = ?");
+    query.addBindValue(gameId);
+    if (!query.exec()) {
+        qWarning() << "Failed to remove cover image for game ID" << gameId
+                   << ":" << query.lastError().text();
+        return;
+    }
     loadGames();
 }

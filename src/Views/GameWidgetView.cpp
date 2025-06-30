@@ -3,6 +3,7 @@
 #include <QPixmap>
 #include <QMenu>
 #include <QContextMenuEvent>
+#include <QAction>
 #include "Models/Game.h"
 
 GameWidgetView::GameWidgetView(QWidget* parent)
@@ -42,6 +43,27 @@ void GameWidgetView::setGame(const Game& game)
 void GameWidgetView::contextMenuEvent(QContextMenuEvent* event)
 {
     QMenu menu(this);
+
+    QAction* launchAction = menu.addAction("Launch Game");
+    connect(launchAction, &QAction::triggered, this, [this]() {
+        emit launchRequested(m_game.id);
+    });
+
+    QAction* showAction = menu.addAction("Show File in Browser");
+    connect(showAction, &QAction::triggered, this, [this]() {
+        emit showFileRequested(m_game.id);
+    });
+
+    QAction* setCoverAction = menu.addAction("Set Cover Image...");
+    connect(setCoverAction, &QAction::triggered, this, [this]() {
+        emit setCoverRequested(m_game.id);
+    });
+
+    QAction* removeCoverAction = menu.addAction("Remove Cover Image");
+    connect(removeCoverAction, &QAction::triggered, this, [this]() {
+        emit removeCoverRequested(m_game.id);
+    });
+
     QAction* removeAction = menu.addAction("Remove Game");
     connect(removeAction, &QAction::triggered, this, [this]() {
         emit removeRequested(m_game.id);

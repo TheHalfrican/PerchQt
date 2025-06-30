@@ -36,6 +36,18 @@ public:
     // Remove a game from the database and update the model
     Q_INVOKABLE void removeGame(int gameId);
 
+    // Launch the game executable by ID
+    Q_INVOKABLE void launchGame(int gameId);
+
+    // Show the game file in the system file browser
+    Q_INVOKABLE void showGameFile(int gameId);
+
+    // Set a custom cover image for the game
+    Q_INVOKABLE void setCoverImage(int gameId, const QString& coverPath);
+
+    // Remove the cover image for the game
+    Q_INVOKABLE void removeCoverImage(int gameId);
+
 signals:
     // Emitted when a game should be launched
     void gameLaunched(const Game& game);

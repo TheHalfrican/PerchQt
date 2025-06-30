@@ -13,6 +13,10 @@
 #include <QSqlError>
 #include <QDebug>
 
+#include <QDesktopServices>
+#include <QUrl>
+#include <QProcess>
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -94,6 +98,14 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         view->setGame(g);
         connect(view, &GameWidgetView::removeRequested,
                 this, &MainWindow::onRemoveGame);
+        connect(view, &GameWidgetView::launchRequested,
+                this, &MainWindow::onLaunchGame);
+        connect(view, &GameWidgetView::showFileRequested,
+                this, &MainWindow::onShowFile);
+        connect(view, &GameWidgetView::setCoverRequested,
+                this, &MainWindow::onSetCoverImage);
+        connect(view, &GameWidgetView::removeCoverRequested,
+                this, &MainWindow::onRemoveCoverImage);
         ui->gridLayout->addWidget(view, row, col);
         if (++col >= columns) {
             col = 0;
@@ -105,4 +117,29 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
 void MainWindow::onRemoveGame(int gameId)
 {
     m_viewModel->removeGame(gameId);
+}
+
+void MainWindow::onLaunchGame(int gameId)
+{
+    m_viewModel->launchGame(gameId);
+}
+
+void MainWindow::onShowFile(int gameId)
+{
+    m_viewModel->showGameFile(gameId);
+}
+
+void MainWindow::onSetCoverImage(int gameId)
+{
+    {
+        QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
+        if (!path.isEmpty()) {
+            m_viewModel->setCoverImage(gameId, path);
+        }
+    }
+}
+
+void MainWindow::onRemoveCoverImage(int gameId)
+{
+    m_viewModel->removeCoverImage(gameId);
 }
