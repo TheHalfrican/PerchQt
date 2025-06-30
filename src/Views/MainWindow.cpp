@@ -9,6 +9,10 @@
 #include <QFileDialog>
 #include <QFileInfo>
 
+#include <QSqlDatabase>
+#include <QSqlError>
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
@@ -16,8 +20,19 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
+    // Verify default database connection
+    {
+        QSqlDatabase db = QSqlDatabase::database();
+        if (!db.isValid() || !db.isOpen()) {
+            qCritical() << "Default DB connection is not open or invalid:"
+                        << (db.isValid() ? db.lastError().text() : "invalid connection");
+        } else {
+            qDebug() << "Using existing DB connection.";
+        }
+    }
+
     // Hook up the model
-    ui->listView->setModel(m_viewModel->gameListModel());
+    // ui->listView->setModel(m_viewModel->gameListModel());
 
     // Connect signals
     connect(ui->listView, &QListView::clicked,
@@ -51,9 +66,8 @@ void MainWindow::onAddGameClicked()
     QFileInfo fi(filePath);
     QString title = fi.baseName();
 
-    // Let user pick an optional cover image
-    QString coverPath = QFileDialog::getOpenFileName(this,
-                                                     "Select Cover Image");
+    // No cover image prompt; leave coverPath empty
+    QString coverPath;
 
     // Delegate to ViewModel
     m_viewModel->addGame(title, filePath, coverPath);
@@ -61,6 +75,8 @@ void MainWindow::onAddGameClicked()
 
 void MainWindow::onGamesLoaded(const QVector<Game>& games)
 {
+    qDebug() << "onGamesLoaded: received" << games.size() << "games";
+
     // Clear existing items from the grid
     QLayoutItem* item;
     while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
@@ -75,12 +91,18 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
-        view->setTitle(g.title);
-        view->setCoverArt(g.coverPath);
+        view->setGame(g);
+        connect(view, &GameWidgetView::removeRequested,
+                this, &MainWindow::onRemoveGame);
         ui->gridLayout->addWidget(view, row, col);
         if (++col >= columns) {
             col = 0;
             ++row;
         }
     }
+}
+
+void MainWindow::onRemoveGame(int gameId)
+{
+    m_viewModel->removeGame(gameId);
 }

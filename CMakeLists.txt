@@ -17,6 +17,17 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 # Find Qt6 components
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql)
 
+# Copy SQLite database files into the build output directory
+file(GLOB DB_FILES "${CMAKE_SOURCE_DIR}/data/*.db")
+foreach(DB_FILE IN LISTS DB_FILES)
+  get_filename_component(DB_NAME ${DB_FILE} NAME)
+  configure_file(
+    "${DB_FILE}"
+    "${CMAKE_BINARY_DIR}/${DB_NAME}"
+    COPYONLY
+  )
+endforeach()
+
 # Define the executable and its sources
 add_executable(PerchQt
     src/main.cpp

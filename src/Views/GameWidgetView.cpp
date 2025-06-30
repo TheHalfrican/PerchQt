@@ -1,6 +1,9 @@
 #include "Views/GameWidgetView.h"
 #include "ui_GameWidgetView.h"
 #include <QPixmap>
+#include <QMenu>
+#include <QContextMenuEvent>
+#include "Models/Game.h"
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -14,13 +17,34 @@ GameWidgetView::~GameWidgetView()
     delete ui;
 }
 
-void GameWidgetView::setTitle(const QString& title)
+void GameWidgetView::setGame(const Game& game)
 {
-    ui->title_label->setText(title);
+    m_game = game;
+
+    // Set the title text
+    ui->titleLabel->setText(game.title);
+
+    // Load & scale the cover image
+    QPixmap pix;
+    if (pix.load(game.coverPath)) {
+        ui->coverLabel->setPixmap(
+            pix.scaled(
+                ui->coverLabel->size(),
+                Qt::KeepAspectRatio,
+                Qt::SmoothTransformation
+            )
+        );
+    } else {
+        ui->coverLabel->setText("(no image)");
+    }
 }
 
-void GameWidgetView::setCoverArt(const QString& coverArtPath)
+void GameWidgetView::contextMenuEvent(QContextMenuEvent* event)
 {
-    QPixmap pixmap(coverArtPath);
-    ui->cover_label->setPixmap(pixmap);
+    QMenu menu(this);
+    QAction* removeAction = menu.addAction("Remove Game");
+    connect(removeAction, &QAction::triggered, this, [this]() {
+        emit removeRequested(m_game.id);
+    });
+    menu.exec(event->globalPos());
 }

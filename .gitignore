@@ -27,3 +27,4 @@ qrc_*.cpp
 # Backup files
 *~
 *.swp
+/data/

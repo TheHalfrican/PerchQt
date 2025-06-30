@@ -12,7 +12,7 @@
         </property>
         <layout class="QVBoxLayout" name="verticalLayout">
             <item>
-                <widget class="QLabel" name="cover_label">
+                <widget class="QLabel" name="coverLabel">
                     <property name="minimumSize">
                         <size>
                             <width>300</width>
@@ -28,7 +28,7 @@
                 </widget>
             </item>
             <item>
-                <widget class="QLabel" name="title_label">
+                <widget class="QLabel" name="titleLabel">
                     <property name="alignment">
                         <set>Qt::AlignCenter</set>
                     </property>

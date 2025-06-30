@@ -33,6 +33,9 @@ public:
                              const QString& filePath,
                              const QString& coverPath);
 
+    // Remove a game from the database and update the model
+    Q_INVOKABLE void removeGame(int gameId);
+
 signals:
     // Emitted when a game should be launched
     void gameLaunched(const Game& game);

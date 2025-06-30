@@ -25,6 +25,7 @@ private:
 private slots:
     void onAddGameClicked();
     void onGamesLoaded(const QVector<Game>& games);
+    void onRemoveGame(int gameId);
 };
 
 #endif // PERCHQT_MAINWINDOW_H

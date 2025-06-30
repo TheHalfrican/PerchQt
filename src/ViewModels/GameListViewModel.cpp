@@ -28,12 +28,21 @@ void GameListViewModel::loadGames()
 {
     QVector<Game> games;
 
-    // 1) Open the SQLite database
-    QSqlDatabase db = QSqlDatabase::addDatabase("QSQLITE");
-    db.setDatabaseName("perch.db");  // adjust path if necessary
-    if (!db.open()) {
-        qWarning() << "Failed to open database:" << db.lastError().text();
+    // 1) Use the existing default database connection
+    QSqlDatabase db = QSqlDatabase::database();
+    if (!db.isValid() || !db.isOpen()) {
+        qWarning() << "Database connection is invalid or not open";
         return;
+    }
+
+    // Debug: list all tables in the default connection
+    qDebug() << "Listing tables in default connection";
+    QSqlQuery tbls(db);
+    if (!tbls.exec("SELECT name FROM sqlite_master WHERE type='table'")) {
+        qWarning() << "Can't list tables:" << tbls.lastError().text();
+    } else {
+        while (tbls.next())
+            qDebug() << "  Table:" << tbls.value(0).toString();
     }
 
     // 2) Execute the query
@@ -126,5 +135,21 @@ void GameListViewModel::addGame(const QString& title,
     }
 
     // Reload model to include the new entry
+    loadGames();
+}
+
+void GameListViewModel::removeGame(int gameId)
+{
+    // Use the existing default database connection
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
+    query.prepare("DELETE FROM games WHERE id = ?");
+    query.addBindValue(gameId);
+    if (!query.exec()) {
+        qWarning() << "Failed to remove game with ID" << gameId
+                   << ":" << query.lastError().text();
+        return;
+    }
+    // Reload model to reflect deletion
     loadGames();
 }
