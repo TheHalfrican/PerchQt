@@ -5,6 +5,9 @@
 #include <QContextMenuEvent>
 #include <QAction>
 #include "Models/Game.h"
+#include <QPainter>
+#include <QColor>
+#include <QFont>
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -36,7 +39,20 @@ void GameWidgetView::setGame(const Game& game)
             )
         );
     } else {
-        ui->coverLabel->setText("(no image)");
+        // Draw a purple placeholder with instruction text
+        QSize size = ui->coverLabel->size();
+        QPixmap placeholder(size);
+        placeholder.fill(QColor(75, 0, 130));
+        QPainter painter(&placeholder);
+        painter.setPen(Qt::white);
+        QFont font = painter.font();
+        font.setBold(true);
+        painter.setFont(font);
+        painter.drawText(placeholder.rect(),
+                         Qt::AlignCenter,
+                         "(Right-click to set Cover Image)");
+        painter.end();
+        ui->coverLabel->setPixmap(placeholder);
     }
 }
 
