@@ -17,6 +17,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QProcess>
+#include <QStringList>
 #include <QToolButton>
 
 MainWindow::MainWindow(QWidget* parent)
@@ -156,5 +157,10 @@ void MainWindow::onRemoveCoverImage(int gameId)
 void MainWindow::onSettingsClicked()
 {
     SettingsDialog dlg(this);
-    dlg.exec();
+    if (dlg.exec() == QDialog::Accepted) {
+        QStringList folders = dlg.scanFolders();
+        for (const QString& folder : folders) {
+            m_viewModel->scanFolder(folder);
+        }
+    }
 }

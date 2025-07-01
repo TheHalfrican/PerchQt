@@ -47,6 +47,8 @@ public:
 
     // Remove the cover image for the game
     Q_INVOKABLE void removeCoverImage(int gameId);
+    // Scan a directory (and its subdirectories) for executables and add them
+    Q_INVOKABLE void scanFolder(const QString& folderPath);
 
 signals:
     // Emitted when a game should be launched

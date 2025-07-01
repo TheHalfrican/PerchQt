@@ -14,6 +14,7 @@
 #include <QUrl>
 #include <QProcess>
 #include <QFileInfo>
+#include <QDirIterator>
 
 GameListViewModel::GameListViewModel(QObject* parent)
     : QObject(parent)
@@ -214,4 +215,26 @@ void GameListViewModel::removeCoverImage(int gameId)
         return;
     }
     loadGames();
+}
+
+void GameListViewModel::scanFolder(const QString& folderPath)
+{
+    QDirIterator it(folderPath,
+                    QDir::Files | QDir::NoSymLinks,
+                    QDirIterator::Subdirectories);
+    while (it.hasNext()) {
+        QString filePath = it.next();
+        QFileInfo fi(filePath);
+        // Only consider executable files (and .exe on Windows)
+#ifdef Q_OS_WIN
+        if (!filePath.endsWith(".exe", Qt::CaseInsensitive))
+            continue;
+#else
+        if (!fi.isExecutable())
+            continue;
+#endif
+        QString title = fi.baseName();
+        // Use empty coverPath for now
+        addGame(title, filePath, QString());
+    }
 }
