@@ -1,0 +1,167 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
+ <class>SettingsDialog</class>
+ <widget class="QDialog" name="SettingsDialog">
+  <property name="windowTitle">
+   <string>Settings</string>
+  </property>
+  <property name="minimumSize">
+    <size>
+      <width>600</width>
+      <height>0</height>
+    </size>
+  </property>
+  <layout class="QVBoxLayout" name="verticalLayout">
+   <item>
+    <widget class="QTabWidget" name="tabs">
+     <property name="tabPosition">
+      <enum>QTabWidget::North</enum>
+     </property>
+     <!-- General Tab -->
+     <widget class="QWidget" name="basic_tab">
+      <attribute name="title">
+       <string>General</string>
+      </attribute>
+      <layout class="QVBoxLayout" name="basic_layout">
+       <!-- Emulator Path -->
+       <item>
+        <layout class="QHBoxLayout" name="emu_layout">
+         <item>
+          <widget class="QLabel" name="emu_path_label">
+           <property name="text">
+            <string>Emulator Path:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="emu_edit"/>
+         </item>
+         <item>
+          <widget class="QPushButton" name="emu_browse">
+           <property name="text">
+            <string>Browse...</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <!-- Scan Folders -->
+       <item>
+        <widget class="QLabel" name="scan_folders_label">
+         <property name="text">
+          <string>Scan Folders:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <widget class="QListWidget" name="folder_list"/>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="folder_btn_layout">
+         <item>
+          <widget class="QPushButton" name="add_folder_btn">
+           <property name="text">
+            <string>Add Folder</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QPushButton" name="remove_folder_btn">
+           <property name="text">
+            <string>Remove Folder</string>
+           </property>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <!-- Launch Args -->
+       <item>
+        <layout class="QHBoxLayout" name="launch_args_layout">
+         <item>
+          <widget class="QLabel" name="launch_args_label">
+           <property name="text">
+            <string>Launch Args:</string>
+           </property>
+          </widget>
+         </item>
+         <item>
+          <widget class="QLineEdit" name="launch_args_edit"/>
+         </item>
+        </layout>
+       </item>
+       <!-- Theme Selection -->
+       <item>
+        <widget class="QLabel" name="theme_label">
+         <property name="text">
+          <string>Theme:</string>
+         </property>
+        </widget>
+       </item>
+       <item>
+        <layout class="QHBoxLayout" name="theme_layout">
+         <item>
+          <widget class="QComboBox" name="theme_combo">
+           <item>
+            <property name="text">
+             <string>System Default</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Light</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Dark</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Xbox 360</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Lavender Teal</string>
+            </property>
+           </item>
+           <item>
+            <property name="text">
+             <string>Custom</string>
+            </property>
+           </item>
+          </widget>
+         </item>
+        </layout>
+       </item>
+       <!-- Edit Custom Theme Button -->
+       <item>
+        <widget class="QPushButton" name="edit_custom_btn">
+         <property name="text">
+          <string>Edit Custom Theme…</string>
+         </property>
+         <property name="enabled">
+          <bool>false</bool>
+         </property>
+        </widget>
+       </item>
+      </layout>
+     </widget>
+    </widget>
+   </item>
+   <item>
+    <widget class="QDialogButtonBox" name="buttonBox">
+     <property name="orientation">
+      <enum>Qt::Horizontal</enum>
+     </property>
+     <property name="standardButtons">
+      <set>QDialogButtonBox::Ok|QDialogButtonBox::Cancel</set>
+     </property>
+    </widget>
+   </item>
+  </layout>
+ </widget>
+ <resources/>
+ <connections/>
+</ui>

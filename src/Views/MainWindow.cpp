@@ -1,5 +1,6 @@
 #include "Views/MainWindow.h"
 #include "ui_MainWindow.h"
+#include "SettingsDialog.h"
 #include "ViewModels/GameListViewModel.h"
 
 #include "Views/GameWidgetView.h"
@@ -16,6 +17,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QProcess>
+#include <QToolButton>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -23,6 +25,10 @@ MainWindow::MainWindow(QWidget* parent)
     , m_viewModel(new GameListViewModel(this))
 {
     ui->setupUi(this);
+
+    // Open Settings dialog when the settings toolbar button is clicked
+    connect(ui->settings_button, &QToolButton::clicked,
+            this, &MainWindow::onSettingsClicked);
 
     // Verify default database connection
     {
@@ -48,6 +54,9 @@ MainWindow::MainWindow(QWidget* parent)
             &GameListViewModel::gamesChanged,
             this,
             &MainWindow::onGamesLoaded);
+
+    connect(ui->actionSettings, &QAction::triggered,
+            this, &MainWindow::onSettingsClicked);
 
     // Load games
     m_viewModel->loadGames();
@@ -142,4 +151,10 @@ void MainWindow::onSetCoverImage(int gameId)
 void MainWindow::onRemoveCoverImage(int gameId)
 {
     m_viewModel->removeCoverImage(gameId);
+}
+
+void MainWindow::onSettingsClicked()
+{
+    SettingsDialog dlg(this);
+    dlg.exec();
 }

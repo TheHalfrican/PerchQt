@@ -30,6 +30,7 @@ private slots:
     void onShowFile(int gameId);
     void onSetCoverImage(int gameId);
     void onRemoveCoverImage(int gameId);
+    void onSettingsClicked();
 };
 
 #endif // PERCHQT_MAINWINDOW_H

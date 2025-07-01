@@ -35,10 +35,12 @@ add_executable(PerchQt
     src/Models/GameListModel.cpp
     src/ViewModels/GameListViewModel.cpp
     src/Views/MainWindow.cpp
+    src/Views/SettingsDialog.cpp
     src/Views/GameWidgetView.cpp
     src/UI/MainWindow.ui
     src/Assets/resources.qrc
     src/UI/GameWidgetView.ui
+    src/UI/SettingsDialog.ui
 )
 
 # Include header directories
