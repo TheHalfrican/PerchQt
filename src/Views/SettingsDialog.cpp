@@ -4,6 +4,7 @@
 #include <QStringList>
 #include <QFileDialog>
 #include <QListWidget>
+#include <QSettings>
 SettingsDialog::SettingsDialog(QWidget* p)
   : QDialog(p), ui(new Ui::SettingsDialog)
 {
@@ -29,6 +30,15 @@ SettingsDialog::SettingsDialog(QWidget* p)
             delete ui->folder_list->takeItem(ui->folder_list->row(item));
         }
     });
+
+    // Populate folder list from saved settings
+    {
+        QSettings settings("PerchOrg", "PerchQt");
+        QStringList folders = settings.value("scanFolders").toStringList();
+        for (const QString& folder : folders) {
+            ui->folder_list->addItem(folder);
+        }
+    }
 }
 QStringList SettingsDialog::scanFolders() const
 {

@@ -17,6 +17,7 @@
 #include <QUrl>
 #include <QProcess>
 #include <QStringList>
+#include <QSettings>
 #include <QToolButton>
 
 MainWindow::MainWindow(QWidget* parent)
@@ -57,6 +58,15 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::onSettingsClicked);
+
+    // Auto-scan saved folders on startup
+    {
+        QSettings settings("PerchOrg", "PerchQt");
+        QStringList folders = settings.value("scanFolders").toStringList();
+        for (const QString& folder : folders) {
+            m_viewModel->scanFolder(folder);
+        }
+    }
 
     // Load games
     m_viewModel->loadGames();
@@ -169,5 +179,8 @@ void MainWindow::onSettingsClicked()
         for (const QString& folder : folders) {
             m_viewModel->scanFolder(folder);
         }
+        // Save for next launch
+        QSettings settings("PerchOrg", "PerchQt");
+        settings.setValue("scanFolders", folders);
     }
 }

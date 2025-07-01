@@ -225,14 +225,11 @@ void GameListViewModel::scanFolder(const QString& folderPath)
     while (it.hasNext()) {
         QString filePath = it.next();
         QFileInfo fi(filePath);
-        // Only consider executable files (and .exe on Windows)
-#ifdef Q_OS_WIN
-        if (!filePath.endsWith(".exe", Qt::CaseInsensitive))
+        // Only consider Xenia_Canary supported image files
+        const QStringList allowedExt = { "iso", "xex", "stfs" };
+        QString ext = fi.suffix().toLower();
+        if (!allowedExt.contains(ext))
             continue;
-#else
-        if (!fi.isExecutable())
-            continue;
-#endif
         QString title = fi.baseName();
         // Use empty coverPath for now
         addGame(title, filePath, QString());
