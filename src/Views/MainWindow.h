@@ -8,6 +8,7 @@
 
 // Forward declarations
 class GameListViewModel;
+class GameWidgetView;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -21,6 +22,8 @@ private:
     // ViewModel driving this window
     GameListViewModel* m_viewModel{nullptr};
     Ui::MainWindow*    ui{nullptr};
+    // Currently selected game widget for single selection
+    GameWidgetView* m_selectedView{nullptr};
 
 private slots:
     void onAddGameClicked();

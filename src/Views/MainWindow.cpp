@@ -4,7 +4,6 @@
 #include "ViewModels/GameListViewModel.h"
 
 #include "Views/GameWidgetView.h"
-#include "Models/Game.h"
 #include <QLayoutItem>
 
 #include <QFileDialog>
@@ -116,6 +115,14 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
                 this, &MainWindow::onSetCoverImage);
         connect(view, &GameWidgetView::removeCoverRequested,
                 this, &MainWindow::onRemoveCoverImage);
+        // Ensure only one selected at a time
+        connect(view, &GameWidgetView::clicked, this, [this, view]() {
+            if (m_selectedView && m_selectedView != view) {
+                m_selectedView->setSelected(false);
+            }
+            m_selectedView = view;
+            view->setSelected(true);
+        });
         ui->gridLayout->addWidget(view, row, col);
         if (++col >= columns) {
             col = 0;

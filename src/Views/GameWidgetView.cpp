@@ -8,6 +8,8 @@
 #include <QPainter>
 #include <QColor>
 #include <QFont>
+#include <QMouseEvent>
+#include <Qt>
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -85,4 +87,23 @@ void GameWidgetView::contextMenuEvent(QContextMenuEvent* event)
         emit removeRequested(m_game.id);
     });
     menu.exec(event->globalPos());
+}
+
+void GameWidgetView::mousePressEvent(QMouseEvent* event)
+{
+    if (event->button() == Qt::LeftButton) {
+        emit clicked(m_game.id);
+        setSelected(true);
+    }
+    QWidget::mousePressEvent(event);
+}
+
+void GameWidgetView::setSelected(bool selected)
+{
+    m_selected = selected;
+    if (selected) {
+        this->setStyleSheet("border: 2px solid blue;");
+    } else {
+        this->setStyleSheet("");
+    }
 }
