@@ -1,4 +1,8 @@
 cmake_minimum_required(VERSION 3.16)
+
+# Enable exporting compile commands for IDE integration
+set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+
 project(PerchQt VERSION 0.1 LANGUAGES CXX)
 
 # Enable Qt auto-moc, auto-uic, and auto-rcc
