@@ -16,6 +16,8 @@ GameWidgetView::GameWidgetView(QWidget* parent)
     , ui(new Ui::GameWidgetView)
 {
     ui->setupUi(this);
+    ui->coverLabel->setScaledContents(false);
+    ui->coverLabel->setAlignment(Qt::AlignCenter);
 }
 
 GameWidgetView::~GameWidgetView()
@@ -30,20 +32,21 @@ void GameWidgetView::setGame(const Game& game)
     // Set the title text
     ui->titleLabel->setText(game.title);
 
-    // Load & scale the cover image
-    QPixmap pix;
-    if (pix.load(game.coverPath)) {
-        ui->coverLabel->setPixmap(
-            pix.scaled(
-                ui->coverLabel->size(),
-                Qt::KeepAspectRatio,
-                Qt::SmoothTransformation
-            )
-        );
+    // Store and display cover image, preserving aspect ratio on resize
+    m_originalCover = QPixmap();
+    if (m_originalCover.load(game.coverPath)) {
+        // Scale to current label width
+        int w = ui->coverLabel->width();
+        QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
+        ui->coverLabel->setPixmap(scaled);
+        // Adjust label height to maintain aspect ratio
+        ui->coverLabel->setFixedHeight(scaled.height());
     } else {
-        // Draw a purple placeholder with instruction text
-        QSize size = ui->coverLabel->size();
-        QPixmap placeholder(size);
+        // Draw a purple placeholder with instruction text at 2:3 aspect ratio
+        int w = ui->coverLabel->width();
+        int h = (w * 3) / 2;  // 2:3 width:height aspect
+        QSize pSize(w, h);
+        QPixmap placeholder(pSize);
         placeholder.fill(QColor(75, 0, 130));
         QPainter painter(&placeholder);
         painter.setPen(Qt::white);
@@ -55,6 +58,7 @@ void GameWidgetView::setGame(const Game& game)
                          "(Right-click to set Cover Image)");
         painter.end();
         ui->coverLabel->setPixmap(placeholder);
+        ui->coverLabel->setFixedHeight(h);
     }
 }
 
@@ -105,5 +109,17 @@ void GameWidgetView::setSelected(bool selected)
         this->setStyleSheet("border: 2px solid blue;");
     } else {
         this->setStyleSheet("");
+    }
+}
+
+void GameWidgetView::resizeEvent(QResizeEvent* event)
+{
+    QWidget::resizeEvent(event);
+    if (!m_originalCover.isNull()) {
+        int w = ui->coverLabel->width();
+        QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
+        ui->coverLabel->setPixmap(scaled);
+        // Adjust label height to maintain aspect ratio on resize
+        ui->coverLabel->setFixedHeight(scaled.height());
     }
 }

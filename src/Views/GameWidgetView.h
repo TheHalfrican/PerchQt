@@ -6,6 +6,8 @@
 #include "Models/Game.h"
 #include <QContextMenuEvent>
 #include <QMouseEvent>
+#include <QResizeEvent>
+#include <QPixmap>
 
 class GameWidgetView : public QWidget {
     Q_OBJECT
@@ -31,11 +33,14 @@ signals:
 protected:
     void mousePressEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private:
     Ui::GameWidgetView* ui{nullptr};
     Game m_game;
     bool m_selected{false};
+    // Store the original cover image for dynamic resizing
+    QPixmap m_originalCover;
 };
 
 #endif // PERCHQT_GAMEWIDGETVIEW_H

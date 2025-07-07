@@ -19,6 +19,8 @@
 #include <QStringList>
 #include <QSettings>
 #include <QToolButton>
+#include <QDial>
+#include <QScrollArea>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -58,6 +60,10 @@ MainWindow::MainWindow(QWidget* parent)
 
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::onSettingsClicked);
+
+    // Adjust grid columns when the dial value changes
+    connect(ui->gridSizeDial, &QDial::valueChanged,
+            this, &MainWindow::onGridSizeChanged);
 
     // Auto-scan saved folders on startup
     {
@@ -100,6 +106,21 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
 {
     qDebug() << "onGamesLoaded: received" << games.size() << "games";
 
+    // Prevent crashes if scrollArea or viewport is unavailable
+    if (!ui->scrollArea) {
+        qWarning() << "onGamesLoaded: scrollArea is null!";
+        return;
+    }
+    QWidget* vp = ui->scrollArea->viewport();
+    if (!vp) {
+        qWarning() << "onGamesLoaded: scrollArea viewport is null!";
+        return;
+    }
+    if (!ui->gridLayout) {
+        qWarning() << "onGamesLoaded: gridLayout is null!";
+        return;
+    }
+
     // Clear existing items from the grid
     QLayoutItem* item;
     while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
@@ -108,12 +129,22 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         delete item;
     }
 
-    // Populate grid with new GameWidgetViews
-    const int columns = 3;
+    // Store games for redisplay
+    m_lastGames = games;
+    // Compute tile size from dial (range 100–350 px)
+    int dialVal = ui->gridSizeDial->value();
+    int tileSize = 50 + dialVal * 50;
+    // Calculate how many columns fit in available width
+    int available = ui->scrollArea->viewport()->width();
+    int columns = qMax(1, available / tileSize);
+    qDebug() << "Using tileSize =" << tileSize << "columns =" << columns;
+
     int row = 0;
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
+        // Fix width only; height adjusts via resizeEvent
+        view->setFixedWidth(tileSize);
         view->setGame(g);
         connect(view, &GameWidgetView::removeRequested,
                 this, &MainWindow::onRemoveGame);
@@ -183,4 +214,10 @@ void MainWindow::onSettingsClicked()
         QSettings settings("PerchOrg", "PerchQt");
         settings.setValue("scanFolders", folders);
     }
+}
+
+void MainWindow::onGridSizeChanged(int /*columns*/)
+{
+    // Re-populate grid using the new column count
+    onGamesLoaded(m_lastGames);
 }

@@ -4,23 +4,17 @@
 <ui version="4.0">
     <class>GameWidgetView</class>
     <widget class="QWidget" name="GameWidgetView">
-        <property name="minimumSize">
-            <size>
-                <width>300</width>
-                <height>500</height>
-            </size>
-        </property>
         <layout class="QVBoxLayout" name="verticalLayout">
             <item>
                 <widget class="QLabel" name="coverLabel">
-                    <property name="minimumSize">
-                        <size>
-                            <width>300</width>
-                            <height>450</height>
-                        </size>
-                    </property>
                     <property name="alignment">
                         <set>Qt::AlignCenter</set>
+                    </property>
+                    <property name="sizePolicy">
+                      <sizepolicy hsizetype="Expanding" vsizetype="Expanding">
+                        <horstretch>0</horstretch>
+                        <verstretch>0</verstretch>
+                      </sizepolicy>
                     </property>
                     <property name="text">
                         <string />

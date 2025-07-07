@@ -24,6 +24,8 @@ private:
     Ui::MainWindow*    ui{nullptr};
     // Currently selected game widget for single selection
     GameWidgetView* m_selectedView{nullptr};
+    // Stored games for redisplay when grid size changes
+    QVector<Game> m_lastGames;
 
 private slots:
     void onAddGameClicked();
@@ -34,6 +36,7 @@ private slots:
     void onSetCoverImage(int gameId);
     void onRemoveCoverImage(int gameId);
     void onSettingsClicked();
+    void onGridSizeChanged(int columns);
 };
 
 #endif // PERCHQT_MAINWINDOW_H
