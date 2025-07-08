@@ -2,6 +2,7 @@
 #include "Views/MainWindow.h"
 #include <QSqlDatabase>
 #include <QSqlError>
+#include <QSqlQuery>
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
@@ -20,6 +21,23 @@ int main(int argc, char *argv[]) {
             return -1;
         }
         qDebug() << "Database opened at" << dbPath;
+        // Ensure the games table exists
+        {
+            QSqlQuery q;
+            const QString createSql = R"(
+                CREATE TABLE IF NOT EXISTS games (
+                    id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    title TEXT,
+                    filePath TEXT,
+                    coverPath TEXT,
+                    lastPlayed TEXT,
+                    playCount INTEGER
+                )
+            )";
+            if (!q.exec(createSql)) {
+                qWarning() << "Failed to create games table:" << q.lastError().text();
+            }
+        }
     }
     // --- End database initialization ---
     MainWindow w;
