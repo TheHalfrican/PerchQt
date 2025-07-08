@@ -10,6 +10,7 @@
 #include <QFont>
 #include <QMouseEvent>
 #include <Qt>
+#include <QRect>
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -40,7 +41,7 @@ void GameWidgetView::setGame(const Game& game)
         QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
         ui->coverLabel->setPixmap(scaled);
         // Adjust label height to maintain aspect ratio
-        ui->coverLabel->setFixedHeight(scaled.height());
+        // ui->coverLabel->setFixedHeight(scaled.height());
     } else {
         // Draw a purple placeholder with instruction text at 2:3 aspect ratio
         int w = ui->coverLabel->width();
@@ -58,7 +59,7 @@ void GameWidgetView::setGame(const Game& game)
                          "(Right-click to set Cover Image)");
         painter.end();
         ui->coverLabel->setPixmap(placeholder);
-        ui->coverLabel->setFixedHeight(h);
+        // ui->coverLabel->setFixedHeight(h);
     }
 }
 
@@ -115,11 +116,34 @@ void GameWidgetView::setSelected(bool selected)
 void GameWidgetView::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
+    int w = ui->coverLabel->width();
     if (!m_originalCover.isNull()) {
-        int w = ui->coverLabel->width();
-        QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
+        // Rescale the actual cover image
+        QPixmap scaled = m_originalCover.scaledToWidth(
+            w, Qt::SmoothTransformation);
         ui->coverLabel->setPixmap(scaled);
-        // Adjust label height to maintain aspect ratio on resize
-        ui->coverLabel->setFixedHeight(scaled.height());
+    } else {
+        // Redraw the placeholder at a 2:3 aspect ratio
+        int h = (w * 3) / 2;
+        QSize pSize(w, h);
+        QPixmap placeholder(pSize);
+        placeholder.fill(QColor(75, 0, 130));
+
+        QPainter painter(&placeholder);
+        painter.setPen(Qt::white);
+        QFont font = painter.font();
+        font.setBold(true);
+        painter.setFont(font);
+
+        // Inset and wrap text
+        int margin = 8;
+        QRect textRect = placeholder.rect().adjusted(
+            margin, margin, -margin, -margin);
+        painter.drawText(textRect,
+                         Qt::AlignCenter | Qt::TextWordWrap,
+                         "(Right-click to set Cover Image)");
+        painter.end();
+
+        ui->coverLabel->setPixmap(placeholder);
     }
 }
