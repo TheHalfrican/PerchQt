@@ -121,6 +121,12 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         return;
     }
 
+    // Clear previous selection
+    if (m_selectedView) {
+        m_selectedView->setSelected(false);
+        m_selectedView = nullptr;
+    }
+
     // Clear existing items from the grid
     QLayoutItem* item;
     while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
@@ -143,8 +149,9 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
-        // Fix width only; height adjusts via resizeEvent
-        view->setFixedWidth(tileSize);
+        // Fix both width and height based on dial
+        constexpr int footerHeight = 30;  // space for title label
+        view->setFixedSize(tileSize, tileSize + footerHeight);
         view->setGame(g);
         connect(view, &GameWidgetView::removeRequested,
                 this, &MainWindow::onRemoveGame);
