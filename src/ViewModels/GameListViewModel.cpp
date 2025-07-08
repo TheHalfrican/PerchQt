@@ -134,13 +134,13 @@ void GameListViewModel::addGame(const QString& title,
     QSqlQuery insert;
     insert.prepare(R"(
         INSERT INTO games(title, file_path, cover_path, last_played, play_count)
-             VALUES(:title, :filePath, :coverPath, :lastPlayed, :playCount)
+             VALUES(:title, :file_path, :cover_path, :last_played, :play_count)
     )");
     insert.bindValue(":title", title);
-    insert.bindValue(":filePath", filePath);
-    insert.bindValue(":coverPath", coverPath);
-    insert.bindValue(":lastPlayed", QString());
-    insert.bindValue(":playCount", 0);
+    insert.bindValue(":file_path", filePath);
+    insert.bindValue(":cover_path", coverPath);
+    insert.bindValue(":last_played", QString());
+    insert.bindValue(":play_count", 0);
     if (!insert.exec()) {
         qWarning() << "Failed to insert game:" << insert.lastError().text();
         return;
