@@ -152,9 +152,8 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
-        // Fix both width and height based on dial
-        constexpr int footerHeight = 30;  // space for title label
-        view->setFixedSize(tileSize, tileSize + footerHeight);
+        // Fix width only; height adjusts via internal layout
+        view->setFixedWidth(tileSize);
         view->setGame(g);
         connect(view, &GameWidgetView::removeRequested,
                 this, &MainWindow::onRemoveGame);
