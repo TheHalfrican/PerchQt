@@ -54,7 +54,7 @@ void GameWidgetView::setGame(const Game& game)
         font.setBold(true);
         painter.setFont(font);
         painter.drawText(placeholder.rect(),
-                         Qt::AlignCenter,
+                         Qt::AlignCenter | Qt::TextWordWrap,
                          "(Right-click to set Cover Image)");
         painter.end();
         ui->coverLabel->setPixmap(placeholder);
