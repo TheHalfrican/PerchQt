@@ -21,6 +21,7 @@
 #include <QToolButton>
 #include <QDial>
 #include <QScrollArea>
+#include <QTimer>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -74,8 +75,10 @@ MainWindow::MainWindow(QWidget* parent)
         }
     }
 
-    // Load games
-    m_viewModel->loadGames();
+    // Load games after the UI is laid out so columns compute correctly
+    QTimer::singleShot(0, this, [this]() {
+        m_viewModel->loadGames();
+    });
 }
 
 MainWindow::~MainWindow()
