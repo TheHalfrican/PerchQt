@@ -1,5 +1,12 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
+ <customwidgets>
+  <customwidget>
+   <class>GameListView</class>
+   <extends>QWidget</extends>
+   <header>Views/GameListView.h</header>
+  </customwidget>
+ </customwidgets>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
@@ -281,7 +288,7 @@
      </widget>
     </item>
     <item>
-     <widget class="QListView" name="listView">
+     <widget class="GameListView" name="listView">
       <property name="visible">
        <bool>false</bool>
       </property>

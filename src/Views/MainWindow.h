@@ -9,6 +9,7 @@
 // Forward declarations
 class GameListViewModel;
 class GameWidgetView;
+class GameListView;
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
@@ -26,6 +27,8 @@ private:
     GameWidgetView* m_selectedView{nullptr};
     // Stored games for redisplay when grid size changes
     QVector<Game> m_lastGames;
+    // The alternate list view widget
+    GameListView* m_listView{nullptr};
 
 private slots:
     void onAddGameClicked();
@@ -37,6 +40,8 @@ private slots:
     void onRemoveCoverImage(int gameId);
     void onSettingsClicked();
     void onGridSizeChanged(int columns);
+    void onListViewClicked();
+    void onGridViewClicked();
 };
 
 #endif // PERCHQT_MAINWINDOW_H

@@ -4,6 +4,7 @@
 #include "ViewModels/GameListViewModel.h"
 
 #include "Views/GameWidgetView.h"
+#include "Views/GameListView.h"
 #include <QLayoutItem>
 
 #include <QFileDialog>
@@ -30,9 +31,21 @@ MainWindow::MainWindow(QWidget* parent)
 {
     ui->setupUi(this);
 
+    // Prepare list view (hidden by default)
+    m_listView = ui->listView;
+    ui->listView->setVisible(false);
+
     // Open Settings dialog when the settings toolbar button is clicked
     connect(ui->settings_button, &QToolButton::clicked,
             this, &MainWindow::onSettingsClicked);
+
+    // Show list view when the list toolbar button is clicked
+    connect(ui->list_button, &QToolButton::clicked,
+            this, &MainWindow::onListViewClicked);
+
+    // Show grid view when the grid toolbar button is clicked
+    connect(ui->grid_button, &QToolButton::clicked,
+            this, &MainWindow::onGridViewClicked);
 
     // Verify default database connection
     {
@@ -49,8 +62,6 @@ MainWindow::MainWindow(QWidget* parent)
     // ui->listView->setModel(m_viewModel->gameListModel());
 
     // Connect signals
-    connect(ui->listView, &QListView::clicked,
-            m_viewModel, &GameListViewModel::onGameSelected);
     connect(ui->actionAddGame, &QAction::triggered,
             this, &MainWindow::onAddGameClicked);
 
@@ -228,5 +239,23 @@ void MainWindow::onSettingsClicked()
 void MainWindow::onGridSizeChanged(int /*columns*/)
 {
     // Re-populate grid using the new column count
+    onGamesLoaded(m_lastGames);
+}
+
+void MainWindow::onListViewClicked()
+{
+    // Switch to list view
+    ui->scrollArea->setVisible(false);
+    ui->listView->setVisible(true);
+    // Populate the list
+    ui->listView->setGames(m_lastGames);
+}
+
+void MainWindow::onGridViewClicked()
+{
+    // Switch to grid view
+    ui->listView->setVisible(false);
+    ui->scrollArea->setVisible(true);
+    // Refresh grid content
     onGamesLoaded(m_lastGames);
 }
