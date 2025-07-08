@@ -254,6 +254,8 @@ void MainWindow::onListViewClicked()
     // Switch to list view
     ui->scrollArea->setVisible(false);
     ui->listView->setVisible(true);
+    // Hide the title toggle button in list view
+    ui->title_toggle_button->setVisible(false);
     // Populate the list
     ui->listView->setGames(m_lastGames);
 }
@@ -263,6 +265,8 @@ void MainWindow::onGridViewClicked()
     // Switch to grid view
     ui->listView->setVisible(false);
     ui->scrollArea->setVisible(true);
+    // Show the title toggle button in grid view
+    ui->title_toggle_button->setVisible(true);
     // Refresh grid content
     onGamesLoaded(m_lastGames);
 }
