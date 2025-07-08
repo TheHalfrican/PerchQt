@@ -28,10 +28,10 @@ int main(int argc, char *argv[]) {
                 CREATE TABLE IF NOT EXISTS games (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT,
-                    filePath TEXT,
-                    coverPath TEXT,
-                    lastPlayed TEXT,
-                    playCount INTEGER
+                    file_path TEXT,
+                    cover_path TEXT,
+                    last_played TEXT,
+                    play_count INTEGER
                 )
             )";
             if (!q.exec(createSql)) {
