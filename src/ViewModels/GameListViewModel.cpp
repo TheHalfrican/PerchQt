@@ -15,6 +15,7 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <algorithm>
 
 GameListViewModel::GameListViewModel(QObject* parent)
     : QObject(parent)
@@ -72,6 +73,12 @@ void GameListViewModel::loadGames()
         );
         games.append(g);
     }
+
+    // Sort games alphabetically by title (case-insensitive)
+    std::sort(games.begin(), games.end(),
+              [](const Game &a, const Game &b) {
+                  return a.title.toLower() < b.title.toLower();
+              });
 
     // 4) Update the model
     m_model->setGames(games);
