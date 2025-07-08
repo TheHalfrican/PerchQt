@@ -62,3 +62,10 @@ target_link_libraries(PerchQt PRIVATE
     Qt6::Widgets
     Qt6::Sql
 )
+
+# Copy the SQLite database into the build output directory for runtime use
+add_custom_command(TARGET PerchQt POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_if_different
+        ${CMAKE_SOURCE_DIR}/data/perch.db
+        $<TARGET_FILE_DIR:PerchQt>/perch.db
+)
