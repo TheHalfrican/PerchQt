@@ -28,6 +28,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_viewModel(new GameListViewModel(this))
+    , m_showTitles(true)
 {
     ui->setupUi(this);
 
@@ -46,6 +47,10 @@ MainWindow::MainWindow(QWidget* parent)
     // Show grid view when the grid toolbar button is clicked
     connect(ui->grid_button, &QToolButton::clicked,
             this, &MainWindow::onGridViewClicked);
+
+    // Toggle game title footers on grid view
+    connect(ui->title_toggle_button, &QToolButton::clicked,
+            this, &MainWindow::onTitleToggleClicked);
 
     // Verify default database connection
     {
@@ -163,6 +168,8 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
+        // Honor current title-visibility setting
+        view->setTitleVisible(m_showTitles);
         // Fix width only; height adjusts via internal layout
         view->setFixedWidth(tileSize);
         view->setGame(g);
@@ -258,4 +265,18 @@ void MainWindow::onGridViewClicked()
     ui->scrollArea->setVisible(true);
     // Refresh grid content
     onGamesLoaded(m_lastGames);
+}
+
+void MainWindow::onTitleToggleClicked()
+{
+    // Flip visibility flag
+    m_showTitles = !m_showTitles;
+    // Update all existing grid items
+    for (int i = 0; i < ui->gridLayout->count(); ++i) {
+        if (auto* item = ui->gridLayout->itemAt(i)) {
+            if (auto* w = qobject_cast<GameWidgetView*>(item->widget())) {
+                w->setTitleVisible(m_showTitles);
+            }
+        }
+    }
 }

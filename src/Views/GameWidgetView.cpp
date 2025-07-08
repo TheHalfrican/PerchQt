@@ -103,6 +103,7 @@ void GameWidgetView::mousePressEvent(QMouseEvent* event)
     QWidget::mousePressEvent(event);
 }
 
+
 void GameWidgetView::setSelected(bool selected)
 {
     m_selected = selected;
@@ -112,6 +113,12 @@ void GameWidgetView::setSelected(bool selected)
         this->setStyleSheet("");
     }
 }
+
+void GameWidgetView::setTitleVisible(bool visible)
+{
+    ui->titleLabel->setVisible(visible);
+}
+
 
 void GameWidgetView::resizeEvent(QResizeEvent* event)
 {

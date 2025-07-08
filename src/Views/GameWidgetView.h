@@ -8,6 +8,7 @@
 #include <QMouseEvent>
 #include <QResizeEvent>
 #include <QPixmap>
+#include <QLabel>
 
 class GameWidgetView : public QWidget {
     Q_OBJECT
@@ -21,6 +22,10 @@ public:
 
     // Highlight this widget when selected
     void setSelected(bool selected);
+
+public slots:
+    // Show or hide the game title footer
+    void setTitleVisible(bool visible);
 
 signals:
     void launchRequested(int gameId);

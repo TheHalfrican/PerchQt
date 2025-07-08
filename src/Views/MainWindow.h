@@ -29,6 +29,8 @@ private:
     QVector<Game> m_lastGames;
     // The alternate list view widget
     GameListView* m_listView{nullptr};
+    // Whether game titles are currently shown in the grid
+    bool m_showTitles{true};
 
 private slots:
     void onAddGameClicked();
@@ -42,6 +44,7 @@ private slots:
     void onGridSizeChanged(int columns);
     void onListViewClicked();
     void onGridViewClicked();
+    void onTitleToggleClicked();
 };
 
 #endif // PERCHQT_MAINWINDOW_H
