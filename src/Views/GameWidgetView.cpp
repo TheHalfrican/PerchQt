@@ -11,6 +11,8 @@
 #include <QMouseEvent>
 #include <Qt>
 #include <QRect>
+#include <QGuiApplication>
+#include <QScreen>
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -123,17 +125,35 @@ void GameWidgetView::setTitleVisible(bool visible)
 void GameWidgetView::resizeEvent(QResizeEvent* event)
 {
     QWidget::resizeEvent(event);
-    int w = ui->coverLabel->width();
+
+    // Determine device pixel ratio for high-DPI scaling
+    qreal dpr = 1.0;
+    if (auto screen = QGuiApplication::primaryScreen())
+        dpr = screen->devicePixelRatio();
+
+    int logicalWidth = ui->coverLabel->width();
+    int logicalHeight = ui->coverLabel->height();
+    QSize physSize(logicalWidth * dpr, logicalHeight * dpr);
+
     if (!m_originalCover.isNull()) {
-        // Rescale the actual cover image
-        QPixmap scaled = m_originalCover.scaledToWidth(
-            w, Qt::SmoothTransformation);
+        // Scale original cover pixmap to physical size, preserving aspect
+        QPixmap scaled = m_originalCover.scaled(
+            physSize,
+            Qt::KeepAspectRatio,
+            Qt::SmoothTransformation
+        );
+        // Inform Qt this pixmap is high-DPI
+        scaled.setDevicePixelRatio(dpr);
         ui->coverLabel->setPixmap(scaled);
     } else {
-        // Redraw the placeholder at a 2:3 aspect ratio
-        int h = (w * 3) / 2;
-        QSize pSize(w, h);
-        QPixmap placeholder(pSize);
+        // Draw high-DPI placeholder at correct aspect ratio (2:3)
+        int physHeight = physSize.height();
+        // Compute physical height from logical ratio 2:3 width:height
+        physHeight = (physSize.width() * 3) / 2;
+        QSize placeholderSize(physSize.width(), physHeight);
+
+        QPixmap placeholder(placeholderSize);
+        placeholder.setDevicePixelRatio(dpr);
         placeholder.fill(QColor(75, 0, 130));
 
         QPainter painter(&placeholder);
@@ -142,13 +162,16 @@ void GameWidgetView::resizeEvent(QResizeEvent* event)
         font.setBold(true);
         painter.setFont(font);
 
-        // Inset and wrap text
-        int margin = 8;
+        // Inset margin in physical pixels
+        int margin = 8 * dpr;
         QRect textRect = placeholder.rect().adjusted(
-            margin, margin, -margin, -margin);
-        painter.drawText(textRect,
-                         Qt::AlignCenter | Qt::TextWordWrap,
-                         "(Right-click to set Cover Image)");
+            margin, margin, -margin, -margin
+        );
+        painter.drawText(
+            textRect,
+            Qt::AlignCenter | Qt::TextWordWrap,
+            "(Right-click to set Cover Image)"
+        );
         painter.end();
 
         ui->coverLabel->setPixmap(placeholder);
