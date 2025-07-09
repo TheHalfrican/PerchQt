@@ -41,6 +41,7 @@ add_executable(PerchQt
     src/Views/MainWindow.cpp
     src/Views/SettingsDialog.cpp
     src/Views/GameWidgetView.cpp
+    src/Utils/PlaceholderImage.cpp
     src/Views/GameListView.cpp
     src/UI/GameListView.ui
     src/Widgets/MarqueeLabel.cpp

@@ -5,14 +5,12 @@
 #include <QContextMenuEvent>
 #include <QAction>
 #include "Models/Game.h"
-#include <QPainter>
-#include <QColor>
-#include <QFont>
 #include <QMouseEvent>
 #include <Qt>
 #include <QRect>
 #include <QGuiApplication>
 #include <QScreen>
+#include "Utils/PlaceholderImage.h"
 
 GameWidgetView::GameWidgetView(QWidget* parent)
     : QWidget(parent)
@@ -45,23 +43,14 @@ void GameWidgetView::setGame(const Game& game)
         // Adjust label height to maintain aspect ratio
         // ui->coverLabel->setFixedHeight(scaled.height());
     } else {
-        // Draw a purple placeholder with instruction text at 2:3 aspect ratio
-        int w = ui->coverLabel->width();
-        int h = (w * 3) / 2;  // 2:3 width:height aspect
-        QSize pSize(w, h);
-        QPixmap placeholder(pSize);
-        placeholder.fill(QColor(75, 0, 130));
-        QPainter painter(&placeholder);
-        painter.setPen(Qt::white);
-        QFont font = painter.font();
-        font.setBold(true);
-        painter.setFont(font);
-        painter.drawText(placeholder.rect(),
-                         Qt::AlignCenter | Qt::TextWordWrap,
-                         "(Right-click to set Cover Image)");
-        painter.end();
+        // Draw placeholder using helper
+        qreal dpr = 1.0;
+        if (auto screen = QGuiApplication::primaryScreen())
+            dpr = screen->devicePixelRatio();
+        int width = ui->coverLabel->width();
+        QPixmap placeholder = PlaceholderImage::generate(width, dpr);
         ui->coverLabel->setPixmap(placeholder);
-        // ui->coverLabel->setFixedHeight(h);
+        ui->coverLabel->setFixedHeight((width * 3) / 2);
     }
 }
 
@@ -146,29 +135,14 @@ void GameWidgetView::resizeEvent(QResizeEvent* event)
         scaled.setDevicePixelRatio(dpr);
         ui->coverLabel->setPixmap(scaled);
     } else {
-        // Draw high-DPI placeholder at correct aspect ratio (2:3)
-        int physHeight = physSize.height();
-        // Compute physical height from logical ratio 2:3 width:height
-        physHeight = (physSize.width() * 3) / 2;
-        QSize placeholderSize(physSize.width(), physHeight);
-
-        QPixmap placeholder(placeholderSize);
-        placeholder.setDevicePixelRatio(dpr);
-        placeholder.fill(QColor(75, 0, 130));
-
-        QPainter painter(&placeholder);
-        painter.setPen(Qt::white);
-        QFont font = painter.font();
-        font.setBold(true);
-        painter.setFont(font);
-        painter.drawText(
-            placeholder.rect(),
-            Qt::AlignCenter | Qt::TextWordWrap,
-            "(Right-click to set Cover Image)"
-        );
-        painter.end();
-
+        // Draw placeholder using helper
+        qreal dpr = 1.0;
+        if (auto screen = QGuiApplication::primaryScreen())
+            dpr = screen->devicePixelRatio();
+        int width = ui->coverLabel->width();
+        QPixmap placeholder = PlaceholderImage::generate(width, dpr);
         ui->coverLabel->setPixmap(placeholder);
+        ui->coverLabel->setFixedHeight((width * 3) / 2);
     }
 }
 
