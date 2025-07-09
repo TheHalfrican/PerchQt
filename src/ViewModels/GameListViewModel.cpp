@@ -15,6 +15,7 @@
 #include <QProcess>
 #include <QFileInfo>
 #include <QDirIterator>
+#include <QSettings>
 #include <algorithm>
 
 GameListViewModel::GameListViewModel(QObject* parent)
@@ -93,10 +94,19 @@ void GameListViewModel::onGameSelected(const QModelIndex& index)
     // Retrieve the selected game
     Game game = m_model->gameAt(index.row());
 
-    // Launch the game executable
-    QString executable = game.filePath;
-    if (!QProcess::startDetached(executable)) {
-        qWarning() << "Failed to launch game:" << executable;
+    // Launch via emulator if configured, otherwise directly
+    QSettings settings("PerchOrg", "PerchQt");
+    QString emulator = settings.value("emulatorPath").toString();
+    bool ok;
+    if (!emulator.isEmpty()) {
+        ok = QProcess::startDetached(emulator, QStringList{ game.filePath });
+    } else {
+        ok = QProcess::startDetached(game.filePath);
+    }
+    if (!ok) {
+        qWarning() << "Failed to launch" 
+                   << (emulator.isEmpty() ? "game" : "emulator")
+                   << (emulator.isEmpty() ? game.filePath : emulator);
         return;
     }
 
@@ -176,9 +186,19 @@ void GameListViewModel::launchGame(int gameId)
                    << ":" << query.lastError().text();
         return;
     }
-    QString path = query.value(0).toString();
-    if (!QProcess::startDetached(path)) {
-        qWarning() << "Failed to launch game executable:" << path;
+    QString gamePath = query.value(0).toString();
+    QSettings settings("PerchOrg", "PerchQt");
+    QString emulator = settings.value("emulatorPath").toString();
+    bool ok;
+    if (!emulator.isEmpty()) {
+        ok = QProcess::startDetached(emulator, QStringList{ gamePath });
+    } else {
+        ok = QProcess::startDetached(gamePath);
+    }
+    if (!ok) {
+        qWarning() << "Failed to launch"
+                   << (emulator.isEmpty() ? "game" : "emulator")
+                   << (emulator.isEmpty() ? gamePath : emulator);
     }
 }
 
