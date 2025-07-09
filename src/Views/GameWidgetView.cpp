@@ -154,3 +154,10 @@ void GameWidgetView::resizeEvent(QResizeEvent* event)
         ui->coverLabel->setPixmap(placeholder);
     }
 }
+
+// Handle double-click to launch the game
+void GameWidgetView::mouseDoubleClickEvent(QMouseEvent* event)
+{
+    emit launchRequested(m_game.id);
+    QWidget::mouseDoubleClickEvent(event);
+}

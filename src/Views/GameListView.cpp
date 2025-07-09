@@ -32,6 +32,9 @@ GameListView::GameListView(QWidget* parent)
             this, &GameListView::onCustomContextMenuRequested);
     connect(ui->table, &QTableWidget::cellActivated,
             this, &GameListView::onCellActivated);
+    // Double-click launches game as well
+    connect(ui->table, &QTableWidget::cellDoubleClicked,
+            this, &GameListView::onCellActivated);
 }
 
 GameListView::~GameListView()

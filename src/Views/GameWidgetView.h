@@ -39,6 +39,8 @@ protected:
     void mousePressEvent(QMouseEvent* event) override;
     void contextMenuEvent(QContextMenuEvent* event) override;
     void resizeEvent(QResizeEvent* event) override;
+    // Handle double-click to launch game
+    void mouseDoubleClickEvent(QMouseEvent* event) override;
 
 private:
     Ui::GameWidgetView* ui{nullptr};
