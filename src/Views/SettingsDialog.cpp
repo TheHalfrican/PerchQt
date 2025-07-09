@@ -1,3 +1,4 @@
+#include <QLineEdit>
 #include "SettingsDialog.h"
 #include "ui_SettingsDialog.h"
 #include <QDialogButtonBox>
@@ -9,9 +10,15 @@ SettingsDialog::SettingsDialog(QWidget* p)
   : QDialog(p), ui(new Ui::SettingsDialog)
 {
     ui->setupUi(this);
-    // Connect standard dialog buttons
-    connect(ui->buttonBox, &QDialogButtonBox::accepted,
-            this, &QDialog::accept);
+    // Save settings and accept
+    connect(ui->buttonBox, &QDialogButtonBox::accepted, this, [this]() {
+        QSettings settings("PerchOrg", "PerchQt");
+        // Persist emulator path
+        settings.setValue("emulatorPath", ui->emu_edit->text());
+        // Persist scan folders
+        settings.setValue("scanFolders", scanFolders());
+        accept();
+    });
     connect(ui->buttonBox, &QDialogButtonBox::rejected,
             this, &QDialog::reject);
 
@@ -39,6 +46,21 @@ SettingsDialog::SettingsDialog(QWidget* p)
             ui->folder_list->addItem(folder);
         }
     }
+
+    // Populate emulator path from saved settings
+    {
+        QSettings settings("PerchOrg", "PerchQt");
+        QString emulator = settings.value("emulatorPath").toString();
+        ui->emu_edit->setText(emulator);
+    }
+
+    // Browse for emulator executable
+    connect(ui->emu_browse, &QPushButton::clicked, this, [this]() {
+        QString file = QFileDialog::getOpenFileName(this, "Select Emulator Executable");
+        if (!file.isEmpty()) {
+            ui->emu_edit->setText(file);
+        }
+    });
 }
 QStringList SettingsDialog::scanFolders() const
 {

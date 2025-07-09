@@ -74,21 +74,6 @@
          </item>
         </layout>
        </item>
-       <!-- Launch Args -->
-       <item>
-        <layout class="QHBoxLayout" name="launch_args_layout">
-         <item>
-          <widget class="QLabel" name="launch_args_label">
-           <property name="text">
-            <string>Launch Args:</string>
-           </property>
-          </widget>
-         </item>
-         <item>
-          <widget class="QLineEdit" name="launch_args_edit"/>
-         </item>
-        </layout>
-       </item>
        <!-- Theme Selection -->
        <item>
         <widget class="QLabel" name="theme_label">
