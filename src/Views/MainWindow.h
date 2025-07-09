@@ -5,6 +5,7 @@
 #include "ui_MainWindow.h"
 #include <QVector>
 #include "Models/Game.h"
+#include <QString>
 
 // Forward declarations
 class GameListViewModel;
@@ -27,6 +28,8 @@ private:
     GameWidgetView* m_selectedView{nullptr};
     // Stored games for redisplay when grid size changes
     QVector<Game> m_lastGames;
+    // Unfiltered full list of games for search/filtering
+    QVector<Game> m_allGames;
     // The alternate list view widget
     GameListView* m_listView{nullptr};
     // Whether game titles are currently shown in the grid
@@ -45,6 +48,7 @@ private slots:
     void onListViewClicked();
     void onGridViewClicked();
     void onTitleToggleClicked();
+    void onSearchTextChanged(const QString& text);
 };
 
 #endif // PERCHQT_MAINWINDOW_H

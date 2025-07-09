@@ -23,6 +23,8 @@
 #include <QDial>
 #include <QScrollArea>
 #include <QTimer>
+#include <QLineEdit>
+#include <QString>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -51,6 +53,10 @@ MainWindow::MainWindow(QWidget* parent)
     // Toggle game title footers on grid view
     connect(ui->title_toggle_button, &QToolButton::clicked,
             this, &MainWindow::onTitleToggleClicked);
+
+    // Filter grid as text is entered
+    connect(ui->search_bar, &QLineEdit::textChanged,
+            this, &MainWindow::onSearchTextChanged);
 
     // Verify default database connection
     {
@@ -133,6 +139,13 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
 {
     qDebug() << "onGamesLoaded: received" << games.size() << "games";
 
+    // Update master list only when no active filter
+    if (ui->search_bar->text().isEmpty()) {
+        m_allGames = games;
+    }
+    // Always update current displayed list
+    m_lastGames = games;
+
     // Prevent crashes if scrollArea or viewport is unavailable
     if (!ui->scrollArea) {
         qWarning() << "onGamesLoaded: scrollArea is null!";
@@ -162,8 +175,6 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         delete item;
     }
 
-    // Store games for redisplay
-    m_lastGames = games;
     // Compute tile size from dial (range 100–350 px)
     int dialVal = ui->gridSizeDial->value();
     int tileSize = 50 + dialVal * 50;
@@ -297,5 +308,21 @@ void MainWindow::onTitleToggleClicked()
                 w->setTitleVisible(m_showTitles);
             }
         }
+    }
+}
+
+void MainWindow::onSearchTextChanged(const QString& text)
+{
+    if (text.isEmpty()) {
+        // Show all games when filter cleared
+        onGamesLoaded(m_allGames);
+    } else {
+        QVector<Game> filtered;
+        filtered.reserve(m_allGames.size());
+        for (const Game& g : m_allGames) {
+            if (g.title.contains(text, Qt::CaseInsensitive))
+                filtered.append(g);
+        }
+        onGamesLoaded(filtered);
     }
 }

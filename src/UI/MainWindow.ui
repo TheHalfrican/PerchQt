@@ -261,9 +261,28 @@
        </widget>
       </item>
       <item>
+       <spacer name="spacer_search">
+         <property name="orientation">
+           <enum>Qt::Horizontal</enum>
+         </property>
+         <property name="sizeType">
+           <enum>QSizePolicy::Expanding</enum>
+         </property>
+         <property name="sizeHint">
+           <size>
+             <width>40</width>
+             <height>20</height>
+           </size>
+         </property>
+       </spacer>
+      </item>
+      <item>
        <widget class="QLineEdit" name="search_bar">
         <property name="placeholderText">
          <string>Search games...</string>
+        </property>
+        <property name="maximumWidth">
+         <number>300</number>
         </property>
        </widget>
       </item>
