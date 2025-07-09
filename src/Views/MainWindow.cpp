@@ -37,6 +37,17 @@ MainWindow::MainWindow(QWidget* parent)
     // Prepare list view (hidden by default)
     m_listView = ui->listView;
     ui->listView->setVisible(false);
+    // Forward list-view actions to the same grid slots
+    connect(m_listView, &GameListView::launchRequested,
+            this, &MainWindow::onLaunchGame);
+    connect(m_listView, &GameListView::removeRequested,
+            this, &MainWindow::onRemoveGame);
+    connect(m_listView, &GameListView::showFileRequested,
+            this, &MainWindow::onShowFile);
+    connect(m_listView, &GameListView::setCoverRequested,
+            this, &MainWindow::onSetCoverImage);
+    connect(m_listView, &GameListView::removeCoverRequested,
+            this, &MainWindow::onRemoveCoverImage);
 
     // Open Settings dialog when the settings toolbar button is clicked
     connect(ui->settings_button, &QToolButton::clicked,
