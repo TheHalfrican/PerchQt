@@ -41,6 +41,6 @@ int main(int argc, char *argv[]) {
     }
     // --- End database initialization ---
     MainWindow w;
-    w.show();
+    w.showMaximized();
     return app.exec();
 }

@@ -81,6 +81,14 @@ MainWindow::MainWindow(QWidget* parent)
     // Adjust grid columns when the dial value changes
     connect(ui->gridSizeDial, &QDial::valueChanged,
             this, &MainWindow::onGridSizeChanged);
+    // Restore previously saved grid size
+    {
+        QSettings settings("PerchOrg", "PerchQt");
+        int savedSize = settings.value("gridSize", ui->gridSizeDial->value()).toInt();
+        ui->gridSizeDial->blockSignals(true);
+        ui->gridSizeDial->setValue(savedSize);
+        ui->gridSizeDial->blockSignals(false);
+    }
 
     // Auto-scan saved folders on startup
     {
@@ -245,6 +253,9 @@ void MainWindow::onSettingsClicked()
 
 void MainWindow::onGridSizeChanged(int /*columns*/)
 {
+    // Save dial setting
+    QSettings settings("PerchOrg", "PerchQt");
+    settings.setValue("gridSize", ui->gridSizeDial->value());
     // Re-populate grid using the new column count
     onGamesLoaded(m_lastGames);
 }
