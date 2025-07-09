@@ -133,7 +133,7 @@ void GameListViewModel::addGame(const QString& title,
 {
     QSqlQuery insert;
     insert.prepare(R"(
-        INSERT INTO games(title, file_path, cover_path, last_played, play_count)
+        INSERT OR IGNORE INTO games(title, file_path, cover_path, last_played, play_count)
              VALUES(:title, :file_path, :cover_path, :last_played, :play_count)
     )");
     insert.bindValue(":title", title);

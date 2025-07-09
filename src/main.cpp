@@ -28,7 +28,7 @@ int main(int argc, char *argv[]) {
                 CREATE TABLE IF NOT EXISTS games (
                     id INTEGER PRIMARY KEY AUTOINCREMENT,
                     title TEXT,
-                    file_path TEXT,
+                    file_path TEXT UNIQUE,
                     cover_path TEXT,
                     last_played TEXT,
                     play_count INTEGER
