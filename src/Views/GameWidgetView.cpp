@@ -36,12 +36,10 @@ void GameWidgetView::setGame(const Game& game)
     // Store and display cover image, preserving aspect ratio on resize
     m_originalCover = QPixmap();
     if (m_originalCover.load(game.coverPath)) {
-        // Scale to current label width
         int w = ui->coverLabel->width();
         QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
         ui->coverLabel->setPixmap(scaled);
-        // Adjust label height to maintain aspect ratio
-        // ui->coverLabel->setFixedHeight(scaled.height());
+        ui->coverLabel->setFixedHeight((w * 3) / 2);
     } else {
         // Draw placeholder using helper
         qreal dpr = 1.0;
