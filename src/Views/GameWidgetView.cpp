@@ -161,14 +161,8 @@ void GameWidgetView::resizeEvent(QResizeEvent* event)
         QFont font = painter.font();
         font.setBold(true);
         painter.setFont(font);
-
-        // Inset margin in physical pixels
-        int margin = 8 * dpr;
-        QRect textRect = placeholder.rect().adjusted(
-            margin, margin, -margin, -margin
-        );
         painter.drawText(
-            textRect,
+            placeholder.rect(),
             Qt::AlignCenter | Qt::TextWordWrap,
             "(Right-click to set Cover Image)"
         );
