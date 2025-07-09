@@ -256,6 +256,8 @@ void MainWindow::onListViewClicked()
     ui->listView->setVisible(true);
     // Hide the title toggle button in list view
     ui->title_toggle_button->setVisible(false);
+    // Hide the grid-size dial in list view
+    ui->gridSizeDial->setVisible(false);
     // Populate the list
     ui->listView->setGames(m_lastGames);
 }
@@ -267,6 +269,8 @@ void MainWindow::onGridViewClicked()
     ui->scrollArea->setVisible(true);
     // Show the title toggle button in grid view
     ui->title_toggle_button->setVisible(true);
+    // Show the grid-size dial in grid view
+    ui->gridSizeDial->setVisible(true);
     // Refresh grid content
     onGamesLoaded(m_lastGames);
 }
