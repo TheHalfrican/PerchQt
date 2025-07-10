@@ -5,6 +5,7 @@
 
 #include "Views/GameWidgetView.h"
 #include "Views/GameListView.h"
+#include "Views/ControllerConfigView.h"
 #include <QLayoutItem>
 
 #include <QFileDialog>
@@ -52,6 +53,10 @@ MainWindow::MainWindow(QWidget* parent)
     // Open Settings dialog when the settings toolbar button is clicked
     connect(ui->settings_button, &QToolButton::clicked,
             this, &MainWindow::onSettingsClicked);
+
+    // Open Controller Config when the controller config toolbar button is clicked
+    connect(ui->controller_config_button, &QToolButton::clicked,
+            this, &MainWindow::onControllerSettingsClicked);
 
     // Show list view when the list toolbar button is clicked
     connect(ui->list_button, &QToolButton::clicked,
@@ -345,4 +350,11 @@ void MainWindow::onSearchTextChanged(const QString& text)
     } else {
         onGamesLoaded(filtered);
     }
+}
+
+void MainWindow::onControllerSettingsClicked()
+{
+    auto* view = new ControllerConfigView(this);
+    view->setAttribute(Qt::WA_DeleteOnClose);
+    view->show();
 }

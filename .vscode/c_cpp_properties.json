@@ -9,11 +9,19 @@
             "compileCommands": "${workspaceFolder}/build/compile_commands.json",
             "includePath": [
                 "${workspaceFolder}/src",
+                "${workspaceFolder}/src/Views",
+                "${workspaceFolder}/src/Models",
+                "${workspaceFolder}/src/ViewModels",
+                "${workspaceFolder}/src/Utils",
+                "${workspaceFolder}/src/Widgets",
+                "${workspaceFolder}/build/PerchQt_autogen/include",
                 "/opt/homebrew/opt/qt/include",
                 "/opt/homebrew/opt/qt/include/QtCore",
                 "/opt/homebrew/opt/qt/include/QtGui",
                 "/opt/homebrew/opt/qt/include/QtWidgets",
-                "${workspaceFolder}/build/PerchQt_autogen/include"
+                "/opt/homebrew/opt/qt/include/QtSql",
+                "/opt/homebrew/opt/qt/include/QtNetwork",
+                "/opt/homebrew/opt/qt/include/QtPrintSupport"
             ],
             "macFrameworkPath": [
                 "/Library/Frameworks",

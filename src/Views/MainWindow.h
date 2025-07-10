@@ -49,6 +49,7 @@ private slots:
     void onGridViewClicked();
     void onTitleToggleClicked();
     void onSearchTextChanged(const QString& text);
+    void onControllerSettingsClicked();
 };
 
 #endif // PERCHQT_MAINWINDOW_H
