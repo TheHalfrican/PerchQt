@@ -134,7 +134,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
-    qDebug() << "[MainWindow::~MainWindow] MainWindow is being destroyed.";
+    qug() << "[MainWindow::~MainWindow] MainWindow is being destroyed.";
 }
 
 void MainWindow::onAddGameClicked()
@@ -162,6 +162,17 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
              << ", m_selectedView =" << m_selectedView
              << ", gridLayout count =" << (ui->gridLayout ? ui->gridLayout->count() : -1);
 
+    // Clear existing grid by replacing the scrollArea's container widget
+    QWidget* oldContainer = ui->scrollArea->takeWidget();
+    if (oldContainer) {
+        oldContainer->deleteLater();
+    }
+    QWidget* newContainer = new QWidget;
+    QGridLayout* newLayout = new QGridLayout(newContainer);
+    ui->scrollArea->setWidget(newContainer);
+    ui->gridLayout = newLayout;
+    m_selectedView = nullptr;
+
     // Update master list only when no active filter
     if (ui->search_bar->text().isEmpty()) {
         m_allGames = games;
@@ -183,25 +194,6 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         qWarning() << "onGamesLoaded: gridLayout is null!";
         return;
     }
-
-    // Clear previous selection
-    if (m_selectedView) {
-        if (m_selectedView)
-            m_selectedView->setSelected(false);
-        m_selectedView = nullptr;
-        qDebug() << "[onGamesLoaded] Cleared previous selection, m_selectedView set to nullptr";
-    }
-
-    // Clear existing grid by replacing the scrollArea's container widget
-    QWidget* oldContainer = ui->scrollArea->takeWidget();
-    if (oldContainer) {
-        oldContainer->deleteLater();
-    }
-    QWidget* newContainer = new QWidget;
-    QGridLayout* newLayout = new QGridLayout(newContainer);
-    ui->scrollArea->setWidget(newContainer);
-    ui->gridLayout = newLayout;
-    m_selectedView = nullptr;
 
     // Compute tile size from dial (range 100–350 px)
     int dialVal = ui->gridSizeDial->value();
@@ -268,26 +260,17 @@ void MainWindow::onShowFile(int gameId)
 
 void MainWindow::onSetCoverImage(int gameId)
 {
-    qDebug() << "[onSetCoverImage] Entry with gameId:" << gameId;
     QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
-    qDebug() << "[onSetCoverImage] File dialog returned path:" << path;
     if (!path.isEmpty()) {
-        qDebug() << "[onSetCoverImage] User chose:" << path;
         m_viewModel->setCoverImage(gameId, path);
-        qDebug() << "[onSetCoverImage] setCoverImage called on viewModel";
         // Refresh list view to pick up the new cover path
         m_listView->setGames(m_lastGames);
-        qDebug() << "[onSetCoverImage] m_listView->setGames called";
     }
-    qDebug() << "[onSetCoverImage] Exit";
 }
 
 void MainWindow::onRemoveCoverImage(int gameId)
 {
-    qDebug() << "[onRemoveCoverImage] Entry with gameId:" << gameId;
     m_viewModel->removeCoverImage(gameId);
-    qDebug() << "[onRemoveCoverImage] removeCoverImage called on viewModel";
-    qDebug() << "[onRemoveCoverImage] Exit";
 }
 
 void MainWindow::onSettingsClicked()

@@ -55,7 +55,7 @@ void GameWidgetView::setGame(const Game& game)
 
 void GameWidgetView::contextMenuEvent(QContextMenuEvent* event)
 {
-    QMenu menu(this);
+    QMenu menu;
 
     QAction* launchAction = menu.addAction("Launch Game");
     connect(launchAction, &QAction::triggered, this, [this]() {
