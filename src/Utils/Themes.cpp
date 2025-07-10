@@ -94,7 +94,7 @@ QPalette Themes::paletteForTheme(Theme theme) {
         }
         case Theme::Custom: {
             // Load custom colors from QSettings
-            QSettings settings;
+            QSettings settings("PerchOrg", "PerchQt");
             QString bg = settings.value("Theme/CustomBgColor", "#ffffff").toString();
             QString text = settings.value("Theme/CustomTextColor", "#000000").toString();
             QString accent = settings.value("Theme/CustomAccentColor", "#0078d7").toString();

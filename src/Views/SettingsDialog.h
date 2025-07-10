@@ -16,6 +16,7 @@ public:
 private slots:
     void onThemeComboChanged(const QString& theme);
     void onAccepted();
+    void onEditCustomTheme();
 private:
     Ui::SettingsDialog* ui;
 };

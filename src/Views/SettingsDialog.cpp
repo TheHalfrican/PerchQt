@@ -1,3 +1,4 @@
+#include <QPushButton>
 #include <QLineEdit>
 #include "SettingsDialog.h"
 #include "ui_SettingsDialog.h"
@@ -8,6 +9,8 @@
 #include <QSettings>
 #include "Utils/Themes.h"
 #include <QComboBox>
+#include <QColorDialog>
+
 SettingsDialog::SettingsDialog(QWidget* p)
   : QDialog(p), ui(new Ui::SettingsDialog)
 {
@@ -61,6 +64,10 @@ SettingsDialog::SettingsDialog(QWidget* p)
     connect(ui->theme_combo, &QComboBox::currentTextChanged,
             this, &SettingsDialog::onThemeComboChanged);
 
+    // Wire up Edit Custom Theme button
+    connect(ui->edit_custom_btn, &QPushButton::clicked,
+            this, &SettingsDialog::onEditCustomTheme);
+
     // Browse for emulator executable
     connect(ui->emu_browse, &QPushButton::clicked, this, [this]() {
         QString file = QFileDialog::getOpenFileName(this, "Select Emulator Executable");
@@ -91,4 +98,43 @@ void SettingsDialog::onAccepted() {
     settings.setValue("Theme/CurrentTheme", ui->theme_combo->currentText());
     Themes::applyTheme(ui->theme_combo->currentText());
     accept();
+}
+
+void SettingsDialog::onEditCustomTheme()
+{
+    QSettings settings("PerchOrg", "PerchQt");
+    // 1) Background
+    {
+        QColorDialog dlg(this);
+        dlg.setWindowTitle(tr("Select Background Color"));
+        QColor init = QColor(settings.value("Theme/CustomBgColor", "#ffffff").toString());
+        dlg.setCurrentColor(init);
+        if (dlg.exec() != QDialog::Accepted) return;
+        QColor bg = dlg.selectedColor();
+        settings.setValue("Theme/CustomBgColor", bg.name());
+    }
+    // 2) Text
+    {
+        QColorDialog dlg(this);
+        dlg.setWindowTitle(tr("Select Text Color"));
+        QColor init = QColor(settings.value("Theme/CustomTextColor", "#000000").toString());
+        dlg.setCurrentColor(init);
+        if (dlg.exec() != QDialog::Accepted) return;
+        QColor text = dlg.selectedColor();
+        settings.setValue("Theme/CustomTextColor", text.name());
+    }
+    // 3) Accent
+    {
+        QColorDialog dlg(this);
+        dlg.setWindowTitle(tr("Select Accent Color"));
+        QColor init = QColor(settings.value("Theme/CustomAccentColor", "#0078d7").toString());
+        dlg.setCurrentColor(init);
+        if (dlg.exec() != QDialog::Accepted) return;
+        QColor accent = dlg.selectedColor();
+        settings.setValue("Theme/CustomAccentColor", accent.name());
+    }
+
+    // Switch combo to Custom and apply immediately
+    ui->theme_combo->setCurrentText(tr("Custom"));
+    Themes::applyTheme(Themes::Theme::Custom);
 }
