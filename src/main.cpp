@@ -6,9 +6,17 @@
 #include <QCoreApplication>
 #include <QDir>
 #include <QDebug>
+#include <QSettings>
+#include "Utils/Themes.h"
 
 int main(int argc, char *argv[]) {
     QApplication app(argc, argv);
+    // Load and apply saved theme
+    {
+        QSettings settings("PerchOrg", "PerchQt");
+        QString theme = settings.value("Theme/CurrentTheme", "System Default").toString();
+        Themes::applyTheme(theme);
+    }
     // --- Database initialization ---
     {
         QString dbPath = QCoreApplication::applicationDirPath()
