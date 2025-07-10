@@ -6,6 +6,7 @@
 #include <QVector>
 #include "Models/Game.h"
 #include <QString>
+#include <QPointer>
 
 // Forward declarations
 class GameListViewModel;
@@ -25,7 +26,7 @@ private:
     GameListViewModel* m_viewModel{nullptr};
     Ui::MainWindow*    ui{nullptr};
     // Currently selected game widget for single selection
-    GameWidgetView* m_selectedView{nullptr};
+    QPointer<GameWidgetView> m_selectedView;
     // Stored games for redisplay when grid size changes
     QVector<Game> m_lastGames;
     // Unfiltered full list of games for search/filtering

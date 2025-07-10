@@ -27,12 +27,16 @@
 #include <QLineEdit>
 #include <QString>
 
+#include <QDebug>
+
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_viewModel(new GameListViewModel(this))
     , m_showTitles(true)
 {
+    
+
     ui->setupUi(this);
 
     // Prepare list view (hidden by default)
@@ -129,6 +133,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
+    
     delete ui;
 }
 
@@ -153,7 +158,7 @@ void MainWindow::onAddGameClicked()
 
 void MainWindow::onGamesLoaded(const QVector<Game>& games)
 {
-    qDebug() << "onGamesLoaded: received" << games.size() << "games";
+    qDebug() << "[onGamesLoaded] received" << games.size() << "games";
 
     // Update master list only when no active filter
     if (ui->search_bar->text().isEmpty()) {
@@ -179,15 +184,21 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
 
     // Clear previous selection
     if (m_selectedView) {
-        m_selectedView->setSelected(false);
+        if (m_selectedView)
+            m_selectedView->setSelected(false);
         m_selectedView = nullptr;
     }
 
     // Clear existing items from the grid
     QLayoutItem* item;
     while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
-        if (QWidget* w = item->widget())
-            w->deleteLater();
+        if (QWidget* w = item->widget()) {
+            if (w == m_selectedView) {
+                m_selectedView = nullptr;
+            }
+            w->setParent(nullptr); // Detach if you want, but do NOT manually delete
+            // w->deleteLater(); // Optional: mark for deletion if needed
+        }
         delete item;
     }
 
@@ -221,7 +232,8 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         // Ensure only one selected at a time
         connect(view, &GameWidgetView::clicked, this, [this, view]() {
             if (m_selectedView && m_selectedView != view) {
-                m_selectedView->setSelected(false);
+                if (m_selectedView)
+                    m_selectedView->setSelected(false);
             }
             m_selectedView = view;
             view->setSelected(true);
@@ -251,17 +263,23 @@ void MainWindow::onShowFile(int gameId)
 
 void MainWindow::onSetCoverImage(int gameId)
 {
+    qDebug() << "[onSetCoverImage] Called with gameId:" << gameId;
     QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
     if (!path.isEmpty()) {
+        qDebug() << "[onSetCoverImage] User chose:" << path;
         m_viewModel->setCoverImage(gameId, path);
+        qDebug() << "[onSetCoverImage] setCoverImage called on viewModel";
         // Refresh list view to pick up the new cover path
         m_listView->setGames(m_lastGames);
+        qDebug() << "[onSetCoverImage] m_listView->setGames called";
     }
 }
 
 void MainWindow::onRemoveCoverImage(int gameId)
 {
+    qDebug() << "[onRemoveCoverImage] Called with gameId:" << gameId;
     m_viewModel->removeCoverImage(gameId);
+    qDebug() << "[onRemoveCoverImage] removeCoverImage called on viewModel";
 }
 
 void MainWindow::onSettingsClicked()
@@ -354,6 +372,7 @@ void MainWindow::onSearchTextChanged(const QString& text)
 
 void MainWindow::onControllerSettingsClicked()
 {
+    qDebug() << "[onControllerSettingsClicked] Opening ControllerConfigView";
     auto* view = new ControllerConfigView(this);
     view->setAttribute(Qt::WA_DeleteOnClose);
     view->show();
