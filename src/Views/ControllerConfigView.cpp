@@ -2,12 +2,14 @@
 #include "ui_ControllerConfigView.h"
 #include <SDL.h>
 #include <QString>
+#include <QProcess>
 
 ControllerConfigView::ControllerConfigView(QWidget* parent)
   : QDialog(parent),
     ui(new Ui::ControllerConfigView)
 {
     ui->setupUi(this);
+    connect(ui->bluetoothButton, &QPushButton::clicked, this, &ControllerConfigView::onBluetoothButtonClicked);
 
     // Initialize SDL game controller subsystem
     if (SDL_InitSubSystem(SDL_INIT_GAMECONTROLLER) < 0) {
@@ -53,4 +55,18 @@ void ControllerConfigView::updateStatus() {
         ui->countLabel->setText(tr("Controllers Connected: %1").arg(controllerCount));
         ui->nameLabel->setText(tr("Controller Name(s): %1").arg(names.join(", ")));
     }
+}
+
+void ControllerConfigView::onBluetoothButtonClicked()
+{
+#ifdef Q_OS_MAC
+    // macOS: Open Bluetooth prefs
+    QProcess::startDetached("open", { "x-apple.systempreferences:com.apple.Bluetooth" });
+#elif defined(Q_OS_WIN)
+    // Windows 10/11: Open Bluetooth settings
+    QProcess::startDetached("start ms-settings:bluetooth", QStringList(), QString(), QProcess::ReadOnly);
+#else
+    // Linux: Try opening bluetooth manager (not guaranteed)
+    QProcess::startDetached("blueman-manager");
+#endif
 }

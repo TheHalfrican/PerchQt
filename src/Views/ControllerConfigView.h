@@ -16,4 +16,7 @@ public:
 private:
     Ui::ControllerConfigView* ui;
     void updateStatus();  // polls SDL2 for controller status
+
+private slots:
+    void onBluetoothButtonClicked();
 };

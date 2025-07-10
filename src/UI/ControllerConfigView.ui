@@ -37,6 +37,13 @@
      </property>
     </widget>
    </item>
+   <item>
+    <widget class="QPushButton" name="bluetoothButton">
+      <property name="text">
+        <string>Open Bluetooth Settings</string>
+      </property>
+    </widget>
+   </item>
   </layout>
  </widget>
  <resources/>
