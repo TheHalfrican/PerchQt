@@ -106,6 +106,7 @@ void SettingsDialog::onEditCustomTheme()
     // 1) Background
     {
         QColorDialog dlg(this);
+        dlg.setOption(QColorDialog::DontUseNativeDialog);
         dlg.setWindowTitle(tr("Select Background Color"));
         QColor init = QColor(settings.value("Theme/CustomBgColor", "#ffffff").toString());
         dlg.setCurrentColor(init);
@@ -116,6 +117,7 @@ void SettingsDialog::onEditCustomTheme()
     // 2) Text
     {
         QColorDialog dlg(this);
+        dlg.setOption(QColorDialog::DontUseNativeDialog);
         dlg.setWindowTitle(tr("Select Text Color"));
         QColor init = QColor(settings.value("Theme/CustomTextColor", "#000000").toString());
         dlg.setCurrentColor(init);
@@ -126,6 +128,7 @@ void SettingsDialog::onEditCustomTheme()
     // 3) Accent
     {
         QColorDialog dlg(this);
+        dlg.setOption(QColorDialog::DontUseNativeDialog);
         dlg.setWindowTitle(tr("Select Accent Color"));
         QColor init = QColor(settings.value("Theme/CustomAccentColor", "#0078d7").toString());
         dlg.setCurrentColor(init);
