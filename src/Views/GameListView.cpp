@@ -1,5 +1,3 @@
-
-
 #include "GameListView.h"
 #include "ui_GameListView.h"
 
@@ -12,6 +10,7 @@
 #include <QDesktopServices>
 #include <QUrl>
 #include <QFileDialog>
+#include "Utils/PlaceholderImage.h"
 
 GameListView::GameListView(QWidget* parent)
     : QWidget(parent)
@@ -25,7 +24,9 @@ GameListView::GameListView(QWidget* parent)
     ui->table->horizontalHeader()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     ui->table->horizontalHeader()->setSectionResizeMode(3, QHeaderView::ResizeToContents);
     ui->table->verticalHeader()->setVisible(false);
-    ui->table->setIconSize(QSize(64, 64)); // adjust as needed
+    ui->table->setIconSize(QSize(128, 192)); // adjust as needed
+    // Ensure each row is tall enough to fit the icon
+    ui->table->verticalHeader()->setDefaultSectionSize(ui->table->iconSize().height() + 10);
 
     // Context menu and activation
     connect(ui->table, &QTableWidget::customContextMenuRequested,
@@ -52,9 +53,19 @@ void GameListView::setGames(const QVector<Game>& games)
         // Cover icon
         QTableWidgetItem* iconItem = new QTableWidgetItem();
         if (!g.coverPath.isEmpty()) {
+            // Scale real cover to icon size
             QPixmap pix(g.coverPath);
-            iconItem->setIcon(QIcon(pix));
+            QPixmap scaled = pix.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            iconItem->setIcon(QIcon(scaled));
+        } else {
+            // Use placeholder image when no cover
+            int iconW = ui->table->iconSize().width();
+            QPixmap placeholder = PlaceholderImage::generate(iconW);
+            QPixmap scaled = placeholder.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            iconItem->setIcon(QIcon(scaled));
         }
+        // Make sure row height matches icon
+        ui->table->setRowHeight(row, ui->table->iconSize().height());
         iconItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         ui->table->setItem(row, 0, iconItem);
 
@@ -72,6 +83,30 @@ void GameListView::setGames(const QVector<Game>& games)
         QTableWidgetItem* countItem = new QTableWidgetItem(QString::number(g.playCount));
         countItem->setFlags(Qt::ItemIsEnabled | Qt::ItemIsSelectable);
         ui->table->setItem(row, 3, countItem);
+    }
+}
+
+void GameListView::updateGameCover(int gameId)
+{
+    for (int row = 0; row < m_games.size(); ++row) {
+        if (m_games[row].id == gameId) {
+            QTableWidgetItem* item = ui->table->item(row, 0);
+            if (item) {
+                const QString& cover = m_games[row].coverPath;
+                if (!cover.isEmpty()) {
+                    QPixmap pix(cover);
+                    QPixmap scaled = pix.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                    item->setIcon(QIcon(scaled));
+                } else {
+                    int iconW = ui->table->iconSize().width();
+                    QPixmap placeholder = PlaceholderImage::generate(iconW);
+                    QPixmap scaled = placeholder.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                    item->setIcon(QIcon(scaled));
+                }
+                ui->table->setRowHeight(row, ui->table->iconSize().height());
+            }
+            break;
+        }
     }
 }
 

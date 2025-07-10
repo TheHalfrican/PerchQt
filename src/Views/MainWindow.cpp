@@ -246,11 +246,11 @@ void MainWindow::onShowFile(int gameId)
 
 void MainWindow::onSetCoverImage(int gameId)
 {
-    {
-        QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
-        if (!path.isEmpty()) {
-            m_viewModel->setCoverImage(gameId, path);
-        }
+    QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
+    if (!path.isEmpty()) {
+        m_viewModel->setCoverImage(gameId, path);
+        // Refresh list view to pick up the new cover path
+        m_listView->setGames(m_lastGames);
     }
 }
 

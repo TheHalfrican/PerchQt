@@ -1,12 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ui version="4.0">
- <customwidgets>
-  <customwidget>
-   <class>GameListView</class>
-   <extends>QWidget</extends>
-   <header>Views/GameListView.h</header>
-  </customwidget>
- </customwidgets>
  <class>MainWindow</class>
  <widget class="QMainWindow" name="MainWindow">
   <property name="geometry">
@@ -24,15 +17,23 @@
    <layout class="QVBoxLayout" name="verticalLayout">
     <item>
      <layout class="QHBoxLayout" name="topRowLayout">
+      <property name="sizeConstraint">
+       <enum>QLayout::SizeConstraint::SetFixedSize</enum>
+      </property>
       <property name="topMargin">
-       <number>20</number>
+       <number>7</number>
       </property>
       <property name="bottomMargin">
-       <number>20</number>
+       <number>7</number>
       </property>
-      <property name="sizeConstraint"><enum>QLayout::SetFixedSize</enum></property>
       <item>
        <widget class="QToolButton" name="settings_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>48</width>
@@ -40,23 +41,6 @@
          </size>
         </property>
         <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>48</height>
-         </size>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/assets/settings_icon.png</normaloff>
-         </iconset>
-        </property>
-        <property name="iconSize">
          <size>
           <width>48</width>
           <height>48</height>
@@ -65,16 +49,32 @@
         <property name="toolTip">
          <string>Settings</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/assets/settings_icon.png</normaloff>:/assets/settings_icon.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="controller_config_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>48</width>
@@ -82,23 +82,6 @@
          </size>
         </property>
         <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>48</height>
-         </size>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/assets/controller_config_icon.png</normaloff>
-         </iconset>
-        </property>
-        <property name="iconSize">
          <size>
           <width>48</width>
           <height>48</height>
@@ -107,16 +90,32 @@
         <property name="toolTip">
          <string>Controller Config</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/assets/controller_config_icon.png</normaloff>:/assets/controller_config_icon.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="grid_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>48</width>
@@ -124,23 +123,6 @@
          </size>
         </property>
         <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>48</height>
-         </size>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/assets/grid_icon.png</normaloff>
-         </iconset>
-        </property>
-        <property name="iconSize">
          <size>
           <width>48</width>
           <height>48</height>
@@ -149,16 +131,32 @@
         <property name="toolTip">
          <string>Grid View</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/assets/grid_icon.png</normaloff>:/assets/grid_icon.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="list_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>48</width>
@@ -166,23 +164,6 @@
          </size>
         </property>
         <property name="maximumSize">
-         <size>
-          <width>48</width>
-          <height>48</height>
-         </size>
-        </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
-        </property>
-        <property name="icon">
-         <iconset>
-          <normaloff>:/assets/list_icon.png</normaloff>
-         </iconset>
-        </property>
-        <property name="iconSize">
          <size>
           <width>48</width>
           <height>48</height>
@@ -191,16 +172,32 @@
         <property name="toolTip">
          <string>List View</string>
         </property>
-        <property name="autoRaise">
-         <bool>true</bool>
+        <property name="icon">
+         <iconset>
+          <normaloff>:/assets/list_icon.png</normaloff>:/assets/list_icon.png</iconset>
+        </property>
+        <property name="iconSize">
+         <size>
+          <width>48</width>
+          <height>48</height>
+         </size>
         </property>
         <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
+        <property name="autoRaise">
+         <bool>true</bool>
         </property>
        </widget>
       </item>
       <item>
        <widget class="QToolButton" name="title_toggle_button">
+        <property name="sizePolicy">
+         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
+          <horstretch>0</horstretch>
+          <verstretch>0</verstretch>
+         </sizepolicy>
+        </property>
         <property name="minimumSize">
          <size>
           <width>48</width>
@@ -213,16 +210,12 @@
           <height>48</height>
          </size>
         </property>
-        <property name="sizePolicy">
-         <sizepolicy hsizetype="Fixed" vsizetype="Fixed">
-          <horstretch>0</horstretch>
-          <verstretch>0</verstretch>
-         </sizepolicy>
+        <property name="toolTip">
+         <string>Show Titles</string>
         </property>
         <property name="icon">
          <iconset>
-          <normaloff>:/assets/tag_icon.png</normaloff>
-         </iconset>
+          <normaloff>:/assets/tag_icon.png</normaloff>:/assets/tag_icon.png</iconset>
         </property>
         <property name="iconSize">
          <size>
@@ -230,17 +223,14 @@
           <height>48</height>
          </size>
         </property>
-        <property name="toolTip">
-         <string>Show Titles</string>
-        </property>
         <property name="checkable">
          <bool>true</bool>
         </property>
+        <property name="toolButtonStyle">
+         <enum>Qt::ToolButtonStyle::ToolButtonIconOnly</enum>
+        </property>
         <property name="autoRaise">
          <bool>true</bool>
-        </property>
-        <property name="toolButtonStyle">
-         <enum>Qt::ToolButtonIconOnly</enum>
         </property>
        </widget>
       </item>
@@ -262,27 +252,24 @@
       </item>
       <item>
        <spacer name="spacer_search">
-         <property name="orientation">
-           <enum>Qt::Horizontal</enum>
-         </property>
-         <property name="sizeType">
-           <enum>QSizePolicy::Expanding</enum>
-         </property>
-         <property name="sizeHint">
-           <size>
-             <width>40</width>
-             <height>20</height>
-           </size>
-         </property>
+        <property name="orientation">
+         <enum>Qt::Orientation::Horizontal</enum>
+        </property>
+        <property name="sizeType">
+         <enum>QSizePolicy::Policy::Expanding</enum>
+        </property>
+        <property name="sizeHint" stdset="0">
+         <size>
+          <width>40</width>
+          <height>20</height>
+         </size>
+        </property>
        </spacer>
       </item>
       <item>
        <widget class="QLineEdit" name="search_bar">
         <property name="placeholderText">
          <string>Search games...</string>
-        </property>
-        <property name="maximumWidth">
-         <number>300</number>
         </property>
        </widget>
       </item>
@@ -299,7 +286,7 @@
          <x>0</x>
          <y>0</y>
          <width>974</width>
-         <height>651</height>
+         <height>663</height>
         </rect>
        </property>
        <layout class="QGridLayout" name="gridLayout"/>
@@ -307,7 +294,7 @@
      </widget>
     </item>
     <item>
-     <widget class="GameListView" name="listView">
+     <widget class="GameListView" name="listView" native="true">
       <property name="visible">
        <bool>false</bool>
       </property>
@@ -389,6 +376,13 @@
    </property>
   </action>
  </widget>
+ <customwidgets>
+  <customwidget>
+   <class>GameListView</class>
+   <extends>QWidget</extends>
+   <header>Views/GameListView.h</header>
+  </customwidget>
+ </customwidgets>
  <resources/>
  <connections/>
 </ui>

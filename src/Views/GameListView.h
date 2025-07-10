@@ -1,5 +1,3 @@
-
-
 #ifndef PERCHQT_GAMELISTVIEW_H
 #define PERCHQT_GAMELISTVIEW_H
 
@@ -21,6 +19,10 @@ public:
 
     // Populate the table with a list of games
     void setGames(const QVector<Game>& games);
+
+public slots:
+    /// Refreshes a single row’s icon when its coverPath changes
+    void updateGameCover(int gameId);
 
 signals:
     void removeRequested(int gameId);
