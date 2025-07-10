@@ -324,16 +324,25 @@ void MainWindow::onTitleToggleClicked()
 
 void MainWindow::onSearchTextChanged(const QString& text)
 {
+    // Build filtered list
+    QVector<Game> filtered;
+    filtered.reserve(m_allGames.size());
     if (text.isEmpty()) {
-        // Show all games when filter cleared
-        onGamesLoaded(m_allGames);
+        filtered = m_allGames;
     } else {
-        QVector<Game> filtered;
-        filtered.reserve(m_allGames.size());
         for (const Game& g : m_allGames) {
             if (g.title.contains(text, Qt::CaseInsensitive))
                 filtered.append(g);
         }
+    }
+
+    // Remember current filtered games
+    m_lastGames = filtered;
+
+    // Update active view
+    if (ui->listView->isVisible()) {
+        m_listView->setGames(filtered);
+    } else {
         onGamesLoaded(filtered);
     }
 }
