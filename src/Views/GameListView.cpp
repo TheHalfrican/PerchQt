@@ -37,9 +37,7 @@ GameListView::GameListView(QWidget* parent)
 }
 
 GameListView::~GameListView()
-{
-    delete ui;
-}
+{}
 
 void GameListView::setGames(const QVector<Game>& games)
 {

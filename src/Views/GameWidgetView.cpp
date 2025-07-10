@@ -23,7 +23,7 @@ GameWidgetView::GameWidgetView(QWidget* parent)
 
 GameWidgetView::~GameWidgetView()
 {
-    delete ui;
+    qDebug() << "GameWidgetView destroyed:" << this;
 }
 
 void GameWidgetView::setGame(const Game& game)

@@ -14,6 +14,7 @@
 #include <QSqlDatabase>
 #include <QSqlError>
 #include <QDebug>
+#include <QGridLayout>
 
 #include <QDesktopServices>
 #include <QUrl>
@@ -133,8 +134,7 @@ MainWindow::MainWindow(QWidget* parent)
 
 MainWindow::~MainWindow()
 {
-    
-    delete ui;
+    qDebug() << "[MainWindow::~MainWindow] MainWindow is being destroyed.";
 }
 
 void MainWindow::onAddGameClicked()
@@ -158,7 +158,9 @@ void MainWindow::onAddGameClicked()
 
 void MainWindow::onGamesLoaded(const QVector<Game>& games)
 {
-    qDebug() << "[onGamesLoaded] received" << games.size() << "games";
+    qDebug() << "[onGamesLoaded] Start: received" << games.size() << "games"
+             << ", m_selectedView =" << m_selectedView
+             << ", gridLayout count =" << (ui->gridLayout ? ui->gridLayout->count() : -1);
 
     // Update master list only when no active filter
     if (ui->search_bar->text().isEmpty()) {
@@ -187,20 +189,19 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
         if (m_selectedView)
             m_selectedView->setSelected(false);
         m_selectedView = nullptr;
+        qDebug() << "[onGamesLoaded] Cleared previous selection, m_selectedView set to nullptr";
     }
 
-    // Clear existing items from the grid
-    QLayoutItem* item;
-    while ((item = ui->gridLayout->takeAt(0)) != nullptr) {
-        if (QWidget* w = item->widget()) {
-            if (w == m_selectedView) {
-                m_selectedView = nullptr;
-            }
-            w->setParent(nullptr); // Detach if you want, but do NOT manually delete
-            // w->deleteLater(); // Optional: mark for deletion if needed
-        }
-        delete item;
+    // Clear existing grid by replacing the scrollArea's container widget
+    QWidget* oldContainer = ui->scrollArea->takeWidget();
+    if (oldContainer) {
+        oldContainer->deleteLater();
     }
+    QWidget* newContainer = new QWidget;
+    QGridLayout* newLayout = new QGridLayout(newContainer);
+    ui->scrollArea->setWidget(newContainer);
+    ui->gridLayout = newLayout;
+    m_selectedView = nullptr;
 
     // Compute tile size from dial (range 100–350 px)
     int dialVal = ui->gridSizeDial->value();
@@ -214,6 +215,7 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
     int col = 0;
     for (const Game& g : games) {
         auto* view = new GameWidgetView(this);
+        qDebug() << "[onGamesLoaded] Created GameWidgetView at" << view << "for game title:" << g.title;
         // Honor current title-visibility setting
         view->setTitleVisible(m_showTitles);
         // Fix width only; height adjusts via internal layout
@@ -231,6 +233,7 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
                 this, &MainWindow::onRemoveCoverImage);
         // Ensure only one selected at a time
         connect(view, &GameWidgetView::clicked, this, [this, view]() {
+            qDebug() << "[GameWidgetView clicked] Old m_selectedView:" << m_selectedView << ", New view:" << view;
             if (m_selectedView && m_selectedView != view) {
                 if (m_selectedView)
                     m_selectedView->setSelected(false);
@@ -244,6 +247,8 @@ void MainWindow::onGamesLoaded(const QVector<Game>& games)
             ++row;
         }
     }
+    m_selectedView = nullptr; // Double safety: clear any reference to deleted/old widgets
+    qDebug() << "[onGamesLoaded] End: grid populated, m_selectedView reset to nullptr";
 }
 
 void MainWindow::onRemoveGame(int gameId)
@@ -263,8 +268,9 @@ void MainWindow::onShowFile(int gameId)
 
 void MainWindow::onSetCoverImage(int gameId)
 {
-    qDebug() << "[onSetCoverImage] Called with gameId:" << gameId;
+    qDebug() << "[onSetCoverImage] Entry with gameId:" << gameId;
     QString path = QFileDialog::getOpenFileName(this, "Select Cover Image");
+    qDebug() << "[onSetCoverImage] File dialog returned path:" << path;
     if (!path.isEmpty()) {
         qDebug() << "[onSetCoverImage] User chose:" << path;
         m_viewModel->setCoverImage(gameId, path);
@@ -273,17 +279,20 @@ void MainWindow::onSetCoverImage(int gameId)
         m_listView->setGames(m_lastGames);
         qDebug() << "[onSetCoverImage] m_listView->setGames called";
     }
+    qDebug() << "[onSetCoverImage] Exit";
 }
 
 void MainWindow::onRemoveCoverImage(int gameId)
 {
-    qDebug() << "[onRemoveCoverImage] Called with gameId:" << gameId;
+    qDebug() << "[onRemoveCoverImage] Entry with gameId:" << gameId;
     m_viewModel->removeCoverImage(gameId);
     qDebug() << "[onRemoveCoverImage] removeCoverImage called on viewModel";
+    qDebug() << "[onRemoveCoverImage] Exit";
 }
 
 void MainWindow::onSettingsClicked()
 {
+    qDebug() << "[onSettingsClicked] Entry";
     SettingsDialog dlg(this);
     if (dlg.exec() == QDialog::Accepted) {
         QStringList folders = dlg.scanFolders();
@@ -294,6 +303,7 @@ void MainWindow::onSettingsClicked()
         QSettings settings("PerchOrg", "PerchQt");
         settings.setValue("scanFolders", folders);
     }
+    qDebug() << "[onSettingsClicked] Exit";
 }
 
 void MainWindow::onGridSizeChanged(int /*columns*/)
@@ -307,6 +317,7 @@ void MainWindow::onGridSizeChanged(int /*columns*/)
 
 void MainWindow::onListViewClicked()
 {
+    qDebug() << "[onListViewClicked] Entry";
     // Switch to list view
     ui->scrollArea->setVisible(false);
     ui->listView->setVisible(true);
@@ -316,10 +327,12 @@ void MainWindow::onListViewClicked()
     ui->gridSizeDial->setVisible(false);
     // Populate the list
     ui->listView->setGames(m_lastGames);
+    qDebug() << "[onListViewClicked] Exit";
 }
 
 void MainWindow::onGridViewClicked()
 {
+    qDebug() << "[onGridViewClicked] Entry";
     // Switch to grid view
     ui->listView->setVisible(false);
     ui->scrollArea->setVisible(true);
@@ -329,6 +342,7 @@ void MainWindow::onGridViewClicked()
     ui->gridSizeDial->setVisible(true);
     // Refresh grid content
     onGamesLoaded(m_lastGames);
+    qDebug() << "[onGridViewClicked] Exit";
 }
 
 void MainWindow::onTitleToggleClicked()
@@ -347,6 +361,7 @@ void MainWindow::onTitleToggleClicked()
 
 void MainWindow::onSearchTextChanged(const QString& text)
 {
+    qDebug() << "[onSearchTextChanged] Entry with text:" << text;
     // Build filtered list
     QVector<Game> filtered;
     filtered.reserve(m_allGames.size());
@@ -368,12 +383,14 @@ void MainWindow::onSearchTextChanged(const QString& text)
     } else {
         onGamesLoaded(filtered);
     }
+    qDebug() << "[onSearchTextChanged] Exit";
 }
 
 void MainWindow::onControllerSettingsClicked()
 {
-    qDebug() << "[onControllerSettingsClicked] Opening ControllerConfigView";
+    qDebug() << "[onControllerSettingsClicked] Entry: Opening ControllerConfigView";
     auto* view = new ControllerConfigView(this);
     view->setAttribute(Qt::WA_DeleteOnClose);
     view->show();
+    qDebug() << "[onControllerSettingsClicked] Exit";
 }

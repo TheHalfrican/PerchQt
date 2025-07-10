@@ -21,7 +21,7 @@ ControllerConfigView::ControllerConfigView(QWidget* parent)
 
 ControllerConfigView::~ControllerConfigView() {
     SDL_QuitSubSystem(SDL_INIT_GAMECONTROLLER);
-    delete ui;
+    
 }
 
 void ControllerConfigView::updateStatus() {

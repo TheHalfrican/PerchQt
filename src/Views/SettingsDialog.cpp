@@ -85,7 +85,7 @@ QStringList SettingsDialog::scanFolders() const
     }
     return folders;
 }
-SettingsDialog::~SettingsDialog() { delete ui; }
+SettingsDialog::~SettingsDialog() {}
 
 void SettingsDialog::onThemeComboChanged(const QString& theme) {
     ui->edit_custom_btn->setEnabled(theme == "Custom");
