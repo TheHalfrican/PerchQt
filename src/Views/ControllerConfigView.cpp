@@ -64,7 +64,7 @@ void ControllerConfigView::onBluetoothButtonClicked()
     QProcess::startDetached("open", { "x-apple.systempreferences:com.apple.Bluetooth" });
 #elif defined(Q_OS_WIN)
     // Windows 10/11: Open Bluetooth settings
-    QProcess::startDetached("start ms-settings:bluetooth", QStringList(), QString(), QProcess::ReadOnly);
+    QProcess::startDetached("cmd.exe", { "/c", "start", "ms-settings:bluetooth" });
 #else
     // Linux: Try opening bluetooth manager (not guaranteed)
     QProcess::startDetached("blueman-manager");
