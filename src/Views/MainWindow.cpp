@@ -133,9 +133,7 @@ MainWindow::MainWindow(QWidget* parent)
 }
 
 MainWindow::~MainWindow()
-{
-    qug() << "[MainWindow::~MainWindow] MainWindow is being destroyed.";
-}
+{}
 
 void MainWindow::onAddGameClicked()
 {
