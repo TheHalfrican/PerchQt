@@ -4,6 +4,7 @@
 #include <QWidget>
 #include <QVector>
 #include <QPoint>
+#include <QScreen>
 #include "Models/Game.h"
 
 namespace Ui {

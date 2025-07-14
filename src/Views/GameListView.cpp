@@ -49,18 +49,22 @@ void GameListView::setGames(const QVector<Game>& games)
         const Game& g = m_games[row];
 
         // Cover icon
+        // Determine device pixel ratio for high-DPI scaling
+        qreal dpr = 1.0;
+        if (auto screen = QGuiApplication::primaryScreen())
+            dpr = screen->devicePixelRatio();
+        QSize iconSize = ui->table->iconSize();
+        QSize physSize(iconSize.width() * dpr, iconSize.height() * dpr);
         QTableWidgetItem* iconItem = new QTableWidgetItem();
         if (!g.coverPath.isEmpty()) {
-            // Scale real cover to icon size
             QPixmap pix(g.coverPath);
-            QPixmap scaled = pix.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            QPixmap scaled = pix.scaled(physSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+            scaled.setDevicePixelRatio(dpr);
             iconItem->setIcon(QIcon(scaled));
         } else {
-            // Use placeholder image when no cover
-            int iconW = ui->table->iconSize().width();
-            QPixmap placeholder = PlaceholderImage::generate(iconW);
-            QPixmap scaled = placeholder.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-            iconItem->setIcon(QIcon(scaled));
+            QPixmap placeholder = PlaceholderImage::generate(iconSize.width(), dpr);
+            placeholder.setDevicePixelRatio(dpr);
+            iconItem->setIcon(QIcon(placeholder));
         }
         // Make sure row height matches icon
         ui->table->setRowHeight(row, ui->table->iconSize().height());
@@ -86,6 +90,12 @@ void GameListView::setGames(const QVector<Game>& games)
 
 void GameListView::updateGameCover(int gameId)
 {
+    // Determine device pixel ratio for high-DPI scaling
+    qreal dpr = 1.0;
+    if (auto screen = QGuiApplication::primaryScreen())
+        dpr = screen->devicePixelRatio();
+    QSize iconSize = ui->table->iconSize();
+    QSize physSize(iconSize.width() * dpr, iconSize.height() * dpr);
     for (int row = 0; row < m_games.size(); ++row) {
         if (m_games[row].id == gameId) {
             QTableWidgetItem* item = ui->table->item(row, 0);
@@ -93,13 +103,13 @@ void GameListView::updateGameCover(int gameId)
                 const QString& cover = m_games[row].coverPath;
                 if (!cover.isEmpty()) {
                     QPixmap pix(cover);
-                    QPixmap scaled = pix.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                    QPixmap scaled = pix.scaled(physSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
+                    scaled.setDevicePixelRatio(dpr);
                     item->setIcon(QIcon(scaled));
                 } else {
-                    int iconW = ui->table->iconSize().width();
-                    QPixmap placeholder = PlaceholderImage::generate(iconW);
-                    QPixmap scaled = placeholder.scaled(ui->table->iconSize(), Qt::KeepAspectRatio, Qt::SmoothTransformation);
-                    item->setIcon(QIcon(scaled));
+                    QPixmap placeholder = PlaceholderImage::generate(iconSize.width(), dpr);
+                    placeholder.setDevicePixelRatio(dpr);
+                    item->setIcon(QIcon(placeholder));
                 }
                 ui->table->setRowHeight(row, ui->table->iconSize().height());
             }
