@@ -105,6 +105,18 @@ MainWindow::MainWindow(QWidget* parent)
     connect(ui->actionSettings, &QAction::triggered,
             this, &MainWindow::onSettingsClicked);
 
+    // Connect menu actions
+    connect(ui->actionControllerSettings, &QAction::triggered,
+            this, &MainWindow::onControllerSettingsClicked);
+    connect(ui->actionExit,                 &QAction::triggered,
+            this, &MainWindow::close);
+    connect(ui->actionToggleTitles,        &QAction::triggered,
+            this, &MainWindow::onTitleToggleClicked);
+    connect(ui->actionGridView,            &QAction::triggered,
+            this, &MainWindow::onGridViewClicked);
+    connect(ui->actionListView,            &QAction::triggered,
+            this, &MainWindow::onListViewClicked);
+
     // Adjust grid columns when the dial value changes
     connect(ui->gridSizeDial, &QDial::valueChanged,
             this, &MainWindow::onGridSizeChanged);
