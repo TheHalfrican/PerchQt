@@ -7,6 +7,8 @@
 #include "Models/Game.h"
 #include <QString>
 #include <QShowEvent>
+#include <QEvent>
+#include <QResizeEvent>
 #include <QPointer>
 
 // Forward declarations
@@ -37,6 +39,9 @@ private:
     // Whether game titles are currently shown in the grid
     bool m_showTitles{true};
 
+    // Reload and rescale the app logo when theme or DPI changes
+    void updateAppLogo();
+
 private slots:
     void onAddGameClicked();
     void onGamesLoaded(const QVector<Game>& games);
@@ -54,7 +59,10 @@ private slots:
     void onControllerSettingsClicked();
 
 protected:
+    // Handle palette or style changes to update logo dynamically
+    void changeEvent(QEvent* event) override;
     void showEvent(QShowEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 };
 
 #endif // PERCHQT_MAINWINDOW_H

@@ -29,6 +29,11 @@
 #include <QString>
 #include <QDebug>
 #include <QShowEvent>
+#include <QResizeEvent>
+
+#include <QGuiApplication>
+#include <QScreen>
+#include <QPalette>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -39,6 +44,12 @@ MainWindow::MainWindow(QWidget* parent)
     
 
     ui->setupUi(this);
+
+    QPixmap test( ":/assets/app_icon.png" );
+    qDebug() << "icon isNull?" << test.isNull();
+    ui->logoLabel->setPixmap( test );
+
+    updateAppLogo();
 
     // Prepare list view (hidden by default)
     m_listView = ui->listView;
@@ -143,6 +154,30 @@ MainWindow::MainWindow(QWidget* parent)
 MainWindow::~MainWindow()
 {}
 
+void MainWindow::updateAppLogo()
+{
+    // Determine device pixel ratio
+    qreal dpr = 1.0;
+    if (auto screen = QGuiApplication::primaryScreen())
+        dpr = screen->devicePixelRatio();
+    // Pick the appropriate logo variant based on background brightness
+    QColor bg = this->palette().color(QPalette::Window);
+    QString logoPath = (bg.lightness() < 128)
+        ? ":/assets/app_icon_alt.png"
+        : ":/assets/app_icon.png";
+    QPixmap logoPixmap(logoPath);
+    // Scale pixmap to fit label size at high DPI
+    QSize lblSize = ui->logoLabel->size() * dpr;
+    QPixmap scaledLogo = logoPixmap.scaled(
+        lblSize,
+        Qt::KeepAspectRatio,
+        Qt::SmoothTransformation
+    );
+    scaledLogo.setDevicePixelRatio(dpr);
+    ui->logoLabel->setPixmap(scaledLogo);
+    ui->logoLabel->setAlignment(Qt::AlignCenter);
+}
+
 // One-time showEvent override to load your games when the window first appears.
 void MainWindow::showEvent(QShowEvent* event)
 {
@@ -154,6 +189,23 @@ void MainWindow::showEvent(QShowEvent* event)
             m_viewModel->loadGames();
         });
     }
+}
+
+void MainWindow::changeEvent(QEvent* event)
+{
+    QMainWindow::changeEvent(event);
+    if (event->type() == QEvent::ApplicationPaletteChange ||
+        event->type() == QEvent::PaletteChange ||
+        event->type() == QEvent::ThemeChange) {
+        updateAppLogo();
+    }
+}
+
+// Re-scale and recenter the app logo whenever the main window is resized
+void MainWindow::resizeEvent(QResizeEvent* event)
+{
+    QMainWindow::resizeEvent(event);
+    updateAppLogo();
 }
 
 void MainWindow::onAddGameClicked()
