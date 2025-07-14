@@ -6,6 +6,7 @@
 #include <QVector>
 #include "Models/Game.h"
 #include <QString>
+#include <QShowEvent>
 #include <QPointer>
 
 // Forward declarations
@@ -51,6 +52,9 @@ private slots:
     void onTitleToggleClicked();
     void onSearchTextChanged(const QString& text);
     void onControllerSettingsClicked();
+
+protected:
+    void showEvent(QShowEvent* event) override;
 };
 
 #endif // PERCHQT_MAINWINDOW_H

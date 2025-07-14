@@ -27,8 +27,8 @@
 #include <QTimer>
 #include <QLineEdit>
 #include <QString>
-
 #include <QDebug>
+#include <QShowEvent>
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
@@ -126,14 +126,23 @@ MainWindow::MainWindow(QWidget* parent)
         }
     }
 
-    // Load games after the UI is laid out so columns compute correctly
-    QTimer::singleShot(0, this, [this]() {
-        m_viewModel->loadGames();
-    });
 }
 
 MainWindow::~MainWindow()
 {}
+
+// One-time showEvent override to load your games when the window first appears.
+void MainWindow::showEvent(QShowEvent* event)
+{
+    QMainWindow::showEvent(event);
+    static bool firstShow = true;
+    if (firstShow) {
+        firstShow = false;
+        QTimer::singleShot(0, this, [this]() {
+            m_viewModel->loadGames();
+        });
+    }
+}
 
 void MainWindow::onAddGameClicked()
 {
