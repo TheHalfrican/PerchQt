@@ -101,9 +101,6 @@ MainWindow::MainWindow(QWidget* parent)
         }
     }
 
-    // Hook up the model
-    // ui->listView->setModel(m_viewModel->gameListModel());
-
     // Connect signals
     connect(ui->actionAddGame, &QAction::triggered,
             this, &MainWindow::onAddGameClicked);

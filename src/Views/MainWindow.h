@@ -25,9 +25,9 @@ public:
     ~MainWindow() override;
 
 private:
+    Ui::MainWindow*    ui{nullptr};
     // ViewModel driving this window
     GameListViewModel* m_viewModel{nullptr};
-    Ui::MainWindow*    ui{nullptr};
     // Currently selected game widget for single selection
     QPointer<GameWidgetView> m_selectedView;
     // Stored games for redisplay when grid size changes

@@ -1,5 +1,4 @@
 #include "ViewModels/GameListViewModel.h"
-#include "Models/GameListModel.h"
 #include "Models/Game.h"
 
 #include <QVector>
@@ -20,39 +19,21 @@
 
 GameListViewModel::GameListViewModel(QObject* parent)
     : QObject(parent)
-    , m_model(new GameListModel(this))
 {
 }
 
 GameListViewModel::~GameListViewModel() = default;
 
-QAbstractListModel* GameListViewModel::gameListModel() const
-{
-    return m_model;
-}
-
 void GameListViewModel::loadGames()
 {
     QVector<Game> games;
 
-    // 1) Use the existing default database connection
     QSqlDatabase db = QSqlDatabase::database();
     if (!db.isValid() || !db.isOpen()) {
         qWarning() << "Database connection is invalid or not open";
         return;
     }
 
-    // Debug: list all tables in the default connection
-    qDebug() << "Listing tables in default connection";
-    QSqlQuery tbls(db);
-    if (!tbls.exec("SELECT name FROM sqlite_master WHERE type='table'")) {
-        qWarning() << "Can't list tables:" << tbls.lastError().text();
-    } else {
-        while (tbls.next())
-            qDebug() << "  Table:" << tbls.value(0).toString();
-    }
-
-    // 2) Execute the query
     QSqlQuery query(db);
     if (!query.exec(R"(
         SELECT id, title, file_path, cover_path, last_played, play_count
@@ -62,86 +43,31 @@ void GameListViewModel::loadGames()
         return;
     }
 
-    // 3) Populate vector from query results
     while (query.next()) {
         Game g(
-            query.value(0).toInt(),         // id
-            query.value(1).toString(),      // title
-            query.value(2).toString(),      // filePath
-            query.value(3).toString(),      // coverPath
-            query.value(4).toString(),      // lastPlayed
-            query.value(5).toInt()          // playCount
+            query.value(0).toInt(),
+            query.value(1).toString(),
+            query.value(2).toString(),
+            query.value(3).toString(),
+            query.value(4).toString(),
+            query.value(5).toInt()
         );
         games.append(g);
     }
 
-    // Sort games alphabetically by title (case-insensitive)
     std::sort(games.begin(), games.end(),
-              [](const Game &a, const Game &b) {
+              [](const Game& a, const Game& b) {
                   return a.title.toLower() < b.title.toLower();
               });
 
-    // 4) Update the model
-    m_model->setGames(games);
     emit gamesChanged(games);
 }
 
-void GameListViewModel::onGameSelected(const QModelIndex& index)
+bool GameListViewModel::insertGame(const QString& title,
+                                   const QString& filePath,
+                                   const QString& coverPath)
 {
-    if (!index.isValid())
-        return;
-
-    // Retrieve the selected game
-    Game game = m_model->gameAt(index.row());
-
-    // Launch via emulator if configured, otherwise directly
-    QSettings settings("PerchOrg", "PerchQt");
-    QString emulator = settings.value("emulatorPath").toString();
-    bool ok;
-    if (!emulator.isEmpty()) {
-        ok = QProcess::startDetached(emulator, QStringList{ game.filePath });
-    } else {
-        ok = QProcess::startDetached(game.filePath);
-    }
-    if (!ok) {
-        qWarning() << "Failed to launch" 
-                   << (emulator.isEmpty() ? "game" : "emulator")
-                   << (emulator.isEmpty() ? game.filePath : emulator);
-        return;
-    }
-
-    // Update lastPlayed and playCount
-    QDateTime now = QDateTime::currentDateTime();
-    game.lastPlayed = now.toString(Qt::ISODate);
-    game.playCount += 1;
-
-    // Write update back to the database
-    QSqlQuery updateQuery;
-    updateQuery.prepare(R"(
-        UPDATE games
-           SET last_played = :lastPlayed,
-               play_count   = :playCount
-         WHERE id           = :id
-    )");
-    updateQuery.bindValue(":lastPlayed", game.lastPlayed);
-    updateQuery.bindValue(":playCount", game.playCount);
-    updateQuery.bindValue(":id", game.id);
-    if (!updateQuery.exec()) {
-        qWarning() << "Failed to update game record:" << updateQuery.lastError().text();
-    }
-
-    // Refresh the model to show updated values
-    loadGames();
-
-    // Emit the signal with the updated game
-    emit gameLaunched(game);
-}
-
-void GameListViewModel::addGame(const QString& title,
-                                const QString& filePath,
-                                const QString& coverPath)
-{
-    QSqlQuery insert;
+    QSqlQuery insert(QSqlDatabase::database());
     insert.prepare(R"(
         INSERT OR IGNORE INTO games(title, file_path, cover_path, last_played, play_count)
              VALUES(:title, :file_path, :cover_path, :last_played, :play_count)
@@ -153,18 +79,22 @@ void GameListViewModel::addGame(const QString& title,
     insert.bindValue(":play_count", 0);
     if (!insert.exec()) {
         qWarning() << "Failed to insert game:" << insert.lastError().text();
-        return;
+        return false;
     }
+    return insert.numRowsAffected() > 0;
+}
 
-    // Reload model to include the new entry
-    loadGames();
+void GameListViewModel::addGame(const QString& title,
+                                const QString& filePath,
+                                const QString& coverPath)
+{
+    if (insertGame(title, filePath, coverPath))
+        loadGames();
 }
 
 void GameListViewModel::removeGame(int gameId)
 {
-    // Use the existing default database connection
-    QSqlDatabase db = QSqlDatabase::database();
-    QSqlQuery query(db);
+    QSqlQuery query(QSqlDatabase::database());
     query.prepare("DELETE FROM games WHERE id = ?");
     query.addBindValue(gameId);
     if (!query.exec()) {
@@ -172,13 +102,13 @@ void GameListViewModel::removeGame(int gameId)
                    << ":" << query.lastError().text();
         return;
     }
-    // Reload model to reflect deletion
     loadGames();
 }
 
 void GameListViewModel::launchGame(int gameId)
 {
-    QSqlQuery query(QSqlDatabase::database());
+    QSqlDatabase db = QSqlDatabase::database();
+    QSqlQuery query(db);
     query.prepare("SELECT file_path FROM games WHERE id = ?");
     query.addBindValue(gameId);
     if (!query.exec() || !query.next()) {
@@ -187,19 +117,37 @@ void GameListViewModel::launchGame(int gameId)
         return;
     }
     QString gamePath = query.value(0).toString();
+
     QSettings settings("PerchOrg", "PerchQt");
     QString emulator = settings.value("emulatorPath").toString();
-    bool ok;
-    if (!emulator.isEmpty()) {
-        ok = QProcess::startDetached(emulator, QStringList{ gamePath });
-    } else {
-        ok = QProcess::startDetached(gamePath);
-    }
+    bool ok = !emulator.isEmpty()
+        ? QProcess::startDetached(emulator, QStringList{ gamePath })
+        : QProcess::startDetached(gamePath);
     if (!ok) {
         qWarning() << "Failed to launch"
                    << (emulator.isEmpty() ? "game" : "emulator")
                    << (emulator.isEmpty() ? gamePath : emulator);
+        return;
     }
+
+    // Bump play_count and last_played now that the launch succeeded.
+    const QString lastPlayed = QDateTime::currentDateTime().toString(Qt::ISODate);
+    QSqlQuery update(db);
+    update.prepare(R"(
+        UPDATE games
+           SET last_played = :lastPlayed,
+               play_count  = play_count + 1
+         WHERE id          = :id
+    )");
+    update.bindValue(":lastPlayed", lastPlayed);
+    update.bindValue(":id", gameId);
+    if (!update.exec()) {
+        qWarning() << "Failed to update play stats for game ID" << gameId
+                   << ":" << update.lastError().text();
+        return;
+    }
+
+    loadGames();
 }
 
 void GameListViewModel::showGameFile(int gameId)
@@ -246,19 +194,32 @@ void GameListViewModel::removeCoverImage(int gameId)
 
 void GameListViewModel::scanFolder(const QString& folderPath)
 {
+    static const QStringList allowedExt = { "iso", "xex", "stfs" };
+
+    QSqlDatabase db = QSqlDatabase::database();
+    const bool inTransaction = db.transaction();
+    if (!inTransaction)
+        qWarning() << "scanFolder: failed to begin transaction:" << db.lastError().text();
+
+    int inserted = 0;
     QDirIterator it(folderPath,
                     QDir::Files | QDir::NoSymLinks,
                     QDirIterator::Subdirectories);
     while (it.hasNext()) {
         QString filePath = it.next();
         QFileInfo fi(filePath);
-        // Only consider Xenia_Canary supported image files
-        const QStringList allowedExt = { "iso", "xex", "stfs" };
-        QString ext = fi.suffix().toLower();
-        if (!allowedExt.contains(ext))
+        if (!allowedExt.contains(fi.suffix().toLower()))
             continue;
-        QString title = fi.baseName();
-        // Use empty coverPath for now
-        addGame(title, filePath, QString());
+        if (insertGame(fi.baseName(), filePath, QString()))
+            ++inserted;
     }
+
+    if (inTransaction && !db.commit()) {
+        qWarning() << "scanFolder: commit failed:" << db.lastError().text();
+        db.rollback();
+        return;
+    }
+
+    if (inserted > 0)
+        loadGames();
 }

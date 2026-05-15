@@ -2,63 +2,52 @@
 #define PERCHQT_GAMELISTVIEWMODEL_H
 
 #include <QObject>
-#include <QAbstractListModel>
-#include <QModelIndex>
 #include <QVector>
-#include "Models/Game.h"
 #include <QString>
-
-// Forward declarations
-class GameListModel;
+#include "Models/Game.h"
 
 class GameListViewModel : public QObject {
     Q_OBJECT
-    Q_PROPERTY(QAbstractListModel* gameListModel READ gameListModel CONSTANT)
 
 public:
     explicit GameListViewModel(QObject* parent = nullptr);
     ~GameListViewModel() override;
 
-    // Expose the underlying model to the view
-    QAbstractListModel* gameListModel() const;
-
-    // Load games from config or data source
+    // Load games from the database and emit gamesChanged.
     Q_INVOKABLE void loadGames();
 
-    // Handle selection from the view
-    Q_INVOKABLE void onGameSelected(const QModelIndex& index);
-
-    // Add a new game to the database and model
+    // Add a new game to the database.
     Q_INVOKABLE void addGame(const QString& title,
                              const QString& filePath,
                              const QString& coverPath);
 
-    // Remove a game from the database and update the model
+    // Remove a game from the database.
     Q_INVOKABLE void removeGame(int gameId);
 
-    // Launch the game executable by ID
+    // Launch the game executable by ID. Bumps play_count and last_played on success.
     Q_INVOKABLE void launchGame(int gameId);
 
-    // Show the game file in the system file browser
+    // Show the game file in the system file browser.
     Q_INVOKABLE void showGameFile(int gameId);
 
-    // Set a custom cover image for the game
+    // Set a custom cover image for the game.
     Q_INVOKABLE void setCoverImage(int gameId, const QString& coverPath);
 
-    // Remove the cover image for the game
+    // Remove the cover image for the game.
     Q_INVOKABLE void removeCoverImage(int gameId);
-    // Scan a directory (and its subdirectories) for executables and add them
+
+    // Scan a directory (and its subdirectories) for executables and add them.
     Q_INVOKABLE void scanFolder(const QString& folderPath);
 
 signals:
-    // Emitted when a game should be launched
     void gameLaunched(const Game& game);
-
-    // Emitted when the list of games has been updated
     void gamesChanged(const QVector<Game>& games);
 
 private:
-    GameListModel* m_model{nullptr};
+    // Insert a single row without reloading. Returns true if a row was inserted.
+    bool insertGame(const QString& title,
+                    const QString& filePath,
+                    const QString& coverPath);
 };
 
 #endif // PERCHQT_GAMELISTVIEWMODEL_H

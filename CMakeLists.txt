@@ -39,8 +39,6 @@ endforeach()
 # Define the executable and its sources
 add_executable(PerchQt
     src/main.cpp
-    src/Models/Game.cpp
-    src/Models/GameListModel.cpp
     src/ViewModels/GameListViewModel.cpp
     src/Views/MainWindow.cpp
     src/Views/SettingsDialog.cpp
