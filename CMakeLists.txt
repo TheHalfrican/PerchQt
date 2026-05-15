@@ -19,6 +19,7 @@ find_package(SDL2 REQUIRED)
 add_executable(PerchQt
     src/main.cpp
     src/Data/Database.cpp
+    src/Input/ControllerManager.cpp
     src/ViewModels/GameListViewModel.cpp
     src/Views/MainWindow.cpp
     src/Views/SettingsDialog.cpp

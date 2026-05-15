@@ -1,6 +1,7 @@
 #include "Views/MainWindow.h"
 #include "ui_MainWindow.h"
 
+#include "Input/ControllerManager.h"
 #include "ViewModels/GameListViewModel.h"
 #include "Views/SettingsDialog.h"
 #include "Views/GameWidgetView.h"
@@ -30,6 +31,7 @@ MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
     , ui(new Ui::MainWindow)
     , m_viewModel(new GameListViewModel(this))
+    , m_controllers(new ControllerManager(this))
     , m_logoUpdateTimer(new QTimer(this))
 {
     ui->setupUi(this);
@@ -77,6 +79,13 @@ MainWindow::MainWindow(QWidget* parent)
             this, &MainWindow::onGamesLoaded);
     connect(m_viewModel, &GameListViewModel::statusMessage, this,
             [this](const QString& msg) { statusBar()->showMessage(msg, kStatusMessageMs); });
+
+    connect(m_controllers, &ControllerManager::moveLeft,        this, [this]{ moveSelection(0, -1); });
+    connect(m_controllers, &ControllerManager::moveRight,       this, [this]{ moveSelection(0, +1); });
+    connect(m_controllers, &ControllerManager::moveUp,          this, [this]{ moveSelection(-1, 0); });
+    connect(m_controllers, &ControllerManager::moveDown,        this, [this]{ moveSelection(+1, 0); });
+    connect(m_controllers, &ControllerManager::confirmPressed,  this, &MainWindow::launchSelected);
+    connect(m_controllers, &ControllerManager::menuPressed,     this, &MainWindow::onSettingsClicked);
 
     // Auto-scan saved folders on startup.
     {
@@ -159,6 +168,7 @@ void MainWindow::rebuildGrid(const QVector<Game>& games)
     const int tileSize = 50 + ui->gridSizeDial->value() * 50;
     const int available = ui->scrollArea->viewport()->width();
     const int columns = qMax(1, available / tileSize);
+    m_gridColumns = columns;
 
     int row = 0, col = 0;
     for (const Game& g : games) {
@@ -171,15 +181,55 @@ void MainWindow::rebuildGrid(const QVector<Game>& games)
         connect(view, &GameWidgetView::showFileRequested,    this, &MainWindow::onShowFile);
         connect(view, &GameWidgetView::setCoverRequested,    this, &MainWindow::onSetCoverImage);
         connect(view, &GameWidgetView::removeCoverRequested, this, &MainWindow::onRemoveCoverImage);
-        connect(view, &GameWidgetView::clicked, this, [this, view]() {
-            if (m_selectedView && m_selectedView != view)
-                m_selectedView->setSelected(false);
-            m_selectedView = view;
-            view->setSelected(true);
+        const int idx = row * columns + col;
+        connect(view, &GameWidgetView::clicked, this, [this, idx]() {
+            selectIndex(idx);
         });
         layout->addWidget(view, row, col);
         if (++col >= columns) { col = 0; ++row; }
     }
+
+    // Restore selection if still valid; otherwise default to first item.
+    if (!games.isEmpty()) {
+        const int target = (m_selectedIndex >= 0 && m_selectedIndex < games.size())
+            ? m_selectedIndex : 0;
+        selectIndex(target);
+    } else {
+        m_selectedIndex = -1;
+    }
+}
+
+void MainWindow::selectIndex(int index)
+{
+    if (index < 0 || index >= m_lastGames.size()) return;
+    if (m_selectedView) m_selectedView->setSelected(false);
+
+    QLayoutItem* item = ui->gridLayout ? ui->gridLayout->itemAt(index) : nullptr;
+    auto* view = item ? qobject_cast<GameWidgetView*>(item->widget()) : nullptr;
+    if (!view) return;
+
+    m_selectedView = view;
+    m_selectedIndex = index;
+    view->setSelected(true);
+    ui->scrollArea->ensureWidgetVisible(view);
+}
+
+void MainWindow::moveSelection(int rowDelta, int colDelta)
+{
+    if (m_lastGames.isEmpty()) return;
+    if (!ui->scrollArea->isVisible()) return; // grid-only for now
+
+    const int columns = qMax(1, m_gridColumns);
+    int idx = (m_selectedIndex < 0) ? 0 : m_selectedIndex;
+    int next = idx + rowDelta * columns + colDelta;
+    next = qBound(0, next, m_lastGames.size() - 1);
+    selectIndex(next);
+}
+
+void MainWindow::launchSelected()
+{
+    if (m_selectedIndex < 0 || m_selectedIndex >= m_lastGames.size()) return;
+    onLaunchGame(m_lastGames.at(m_selectedIndex).id);
 }
 
 void MainWindow::applyCurrentFilter()
@@ -220,7 +270,7 @@ void MainWindow::onSetCoverImage(int gameId)
     const QString path = QFileDialog::getOpenFileName(this, tr("Select Cover Image"));
     if (path.isEmpty()) return;
     m_viewModel->setCoverImage(gameId, path);
-    // List view's setGames is called via the gamesChanged reload that follows.
+    // List view's setGames is called below via the gamesChanged reload.
 }
 
 void MainWindow::onSettingsClicked()
@@ -281,7 +331,7 @@ void MainWindow::onSearchTextChanged(const QString& /*text*/)
 
 void MainWindow::onControllerSettingsClicked()
 {
-    auto* view = new ControllerConfigView(this);
+    auto* view = new ControllerConfigView(m_controllers, this);
     view->setAttribute(Qt::WA_DeleteOnClose);
     view->show();
 }
