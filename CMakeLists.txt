@@ -16,7 +16,13 @@ set(CMAKE_CXX_EXTENSIONS OFF)
 find_package(Qt6 REQUIRED COMPONENTS Core Gui Widgets Sql Concurrent)
 find_package(SDL2 REQUIRED)
 
-add_executable(PerchQt
+set(PERCHQT_PLATFORM_SOURCES "")
+if(WIN32)
+    list(APPEND PERCHQT_PLATFORM_SOURCES src/Assets/app.rc)
+endif()
+
+add_executable(PerchQt WIN32
+    ${PERCHQT_PLATFORM_SOURCES}
     src/main.cpp
     src/Data/Database.cpp
     src/Input/ControllerManager.cpp

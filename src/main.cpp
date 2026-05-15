@@ -1,5 +1,6 @@
 #include <QApplication>
 #include <QCoreApplication>
+#include <QIcon>
 #include <QSettings>
 
 #include "Views/MainWindow.h"
@@ -13,6 +14,7 @@ int main(int argc, char* argv[])
     QCoreApplication::setOrganizationName("PerchOrg");
     QCoreApplication::setApplicationName("PerchQt");
     QCoreApplication::setApplicationVersion("0.1");
+    app.setWindowIcon(QIcon(":/assets/app_icon.png"));
 
     Themes::applyTheme(QSettings().value("Theme/CurrentTheme", "System Default").toString());
 
