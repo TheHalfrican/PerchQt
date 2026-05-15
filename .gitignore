@@ -1,5 +1,6 @@
 # Build outputs
 /build/
+/build-mingw/
 /CMakeFiles/
 /CMakeCache.txt
 /*.cbp
@@ -7,6 +8,7 @@
 Makefile
 cmake_install.cmake
 install_manifest.txt
+compile_commands.json
 
 # Qt Creator
 *.autosave
@@ -21,10 +23,19 @@ moc_*.h
 ui_*.h
 qrc_*.cpp
 
-# macOS
+# OS / editor cruft
 .DS_Store
-
-# Backup files
 *~
 *.swp
+*.stackdump
+
+# Local data — uncomment to commit a seed perch.db for fresh clones
 /data/
+
+# Editor / IDE per-machine config
+.vscode/c_cpp_properties.json
+.vscode/tasks.json
+.vscode/launch.json
+
+# Claude Code per-user settings
+.claude/
