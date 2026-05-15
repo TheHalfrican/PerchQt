@@ -39,7 +39,7 @@ SettingsDialog::SettingsDialog(QWidget* p)
 
     // Populate folder list from saved settings
     {
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         QStringList folders = settings.value("scanFolders").toStringList();
         for (const QString& folder : folders) {
             ui->folder_list->addItem(folder);
@@ -48,13 +48,13 @@ SettingsDialog::SettingsDialog(QWidget* p)
 
     // Populate emulator path from saved settings
     {
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         QString emulator = settings.value("emulatorPath").toString();
         ui->emu_edit->setText(emulator);
     }
     // Populate theme from saved settings
     {
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         QString theme = settings.value("Theme/CurrentTheme", "System Default").toString();
         int idx = ui->theme_combo->findText(theme);
         if (idx >= 0) ui->theme_combo->setCurrentIndex(idx);
@@ -92,7 +92,7 @@ void SettingsDialog::onThemeComboChanged(const QString& theme) {
 }
 
 void SettingsDialog::onAccepted() {
-    QSettings settings("PerchOrg", "PerchQt");
+    QSettings settings;
     settings.setValue("emulatorPath", ui->emu_edit->text());
     settings.setValue("scanFolders", scanFolders());
     settings.setValue("Theme/CurrentTheme", ui->theme_combo->currentText());
@@ -102,7 +102,7 @@ void SettingsDialog::onAccepted() {
 
 void SettingsDialog::onEditCustomTheme()
 {
-    QSettings settings("PerchOrg", "PerchQt");
+    QSettings settings;
     // 1) Background
     {
         QColorDialog dlg(this);

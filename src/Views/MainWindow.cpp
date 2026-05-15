@@ -130,7 +130,7 @@ MainWindow::MainWindow(QWidget* parent)
             this, &MainWindow::onGridSizeChanged);
     // Restore previously saved grid size
     {
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         int savedSize = settings.value("gridSize", ui->gridSizeDial->value()).toInt();
         ui->gridSizeDial->blockSignals(true);
         ui->gridSizeDial->setValue(savedSize);
@@ -139,7 +139,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     // Auto-scan saved folders on startup
     {
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         QStringList folders = settings.value("scanFolders").toStringList();
         for (const QString& folder : folders) {
             m_viewModel->scanFolder(folder);
@@ -351,7 +351,7 @@ void MainWindow::onSettingsClicked()
             m_viewModel->scanFolder(folder);
         }
         // Save for next launch
-        QSettings settings("PerchOrg", "PerchQt");
+        QSettings settings;
         settings.setValue("scanFolders", folders);
     }
     qDebug() << "[onSettingsClicked] Exit";
@@ -360,7 +360,7 @@ void MainWindow::onSettingsClicked()
 void MainWindow::onGridSizeChanged(int /*columns*/)
 {
     // Save dial setting
-    QSettings settings("PerchOrg", "PerchQt");
+    QSettings settings;
     settings.setValue("gridSize", ui->gridSizeDial->value());
     // Re-populate grid using the new column count
     onGamesLoaded(m_lastGames);

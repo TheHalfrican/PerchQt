@@ -118,7 +118,7 @@ void GameListViewModel::launchGame(int gameId)
     }
     QString gamePath = query.value(0).toString();
 
-    QSettings settings("PerchOrg", "PerchQt");
+    QSettings settings;
     QString emulator = settings.value("emulatorPath").toString();
     bool ok = !emulator.isEmpty()
         ? QProcess::startDetached(emulator, QStringList{ gamePath })
