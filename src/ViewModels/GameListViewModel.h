@@ -42,6 +42,7 @@ public:
 signals:
     void gameLaunched(const Game& game);
     void gamesChanged(const QVector<Game>& games);
+    void statusMessage(const QString& message);
 
 private:
     // Insert a single row without reloading. Returns true if a row was inserted.

@@ -88,8 +88,12 @@ void GameListViewModel::addGame(const QString& title,
                                 const QString& filePath,
                                 const QString& coverPath)
 {
-    if (insertGame(title, filePath, coverPath))
+    if (insertGame(title, filePath, coverPath)) {
+        emit statusMessage(tr("Added: %1").arg(title));
         loadGames();
+    } else {
+        emit statusMessage(tr("Already in library: %1").arg(title));
+    }
 }
 
 void GameListViewModel::removeGame(int gameId)
@@ -217,8 +221,13 @@ void GameListViewModel::scanFolder(const QString& folderPath)
     if (inTransaction && !db.commit()) {
         qWarning() << "scanFolder: commit failed:" << db.lastError().text();
         db.rollback();
+        emit statusMessage(tr("Scan of %1 failed").arg(folderPath));
         return;
     }
+
+    emit statusMessage(inserted > 0
+        ? tr("Added %1 game(s) from %2").arg(inserted).arg(folderPath)
+        : tr("No new games found in %1").arg(folderPath));
 
     if (inserted > 0)
         loadGames();

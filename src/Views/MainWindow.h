@@ -2,45 +2,32 @@
 #define PERCHQT_MAINWINDOW_H
 
 #include <QMainWindow>
-#include "ui_MainWindow.h"
-#include <QVector>
-#include "Models/Game.h"
-#include <QString>
-#include <QShowEvent>
-#include <QEvent>
-#include <QResizeEvent>
 #include <QPointer>
+#include <QString>
+#include <QVector>
 
-// Forward declarations
+#include "Models/Game.h"
+
+class QTimer;
+class QEvent;
+class QShowEvent;
+class QResizeEvent;
 class GameListViewModel;
 class GameWidgetView;
 class GameListView;
+namespace Ui { class MainWindow; }
 
 class MainWindow : public QMainWindow {
     Q_OBJECT
 
 public:
-    // Constructor
     explicit MainWindow(QWidget* parent = nullptr);
     ~MainWindow() override;
 
-private:
-    Ui::MainWindow*    ui{nullptr};
-    // ViewModel driving this window
-    GameListViewModel* m_viewModel{nullptr};
-    // Currently selected game widget for single selection
-    QPointer<GameWidgetView> m_selectedView;
-    // Stored games for redisplay when grid size changes
-    QVector<Game> m_lastGames;
-    // Unfiltered full list of games for search/filtering
-    QVector<Game> m_allGames;
-    // The alternate list view widget
-    GameListView* m_listView{nullptr};
-    // Whether game titles are currently shown in the grid
-    bool m_showTitles{true};
-
-    // Reload and rescale the app logo when theme or DPI changes
-    void updateAppLogo();
+protected:
+    void changeEvent(QEvent* event) override;
+    void showEvent(QShowEvent* event) override;
+    void resizeEvent(QResizeEvent* event) override;
 
 private slots:
     void onAddGameClicked();
@@ -58,11 +45,20 @@ private slots:
     void onSearchTextChanged(const QString& text);
     void onControllerSettingsClicked();
 
-protected:
-    // Handle palette or style changes to update logo dynamically
-    void changeEvent(QEvent* event) override;
-    void showEvent(QShowEvent* event) override;
-    void resizeEvent(QResizeEvent* event) override;
+private:
+    void updateAppLogo();
+    void rebuildGrid(const QVector<Game>& games);
+    void applyCurrentFilter();
+    void persistShowTitles() const;
+
+    Ui::MainWindow* ui{nullptr};
+    GameListViewModel* m_viewModel{nullptr};
+    QPointer<GameWidgetView> m_selectedView;
+    QVector<Game> m_lastGames;       // currently displayed (post-filter)
+    QVector<Game> m_allGames;        // unfiltered master list
+    GameListView* m_listView{nullptr};
+    QTimer* m_logoUpdateTimer{nullptr};
+    bool m_showTitles{true};
 };
 
 #endif // PERCHQT_MAINWINDOW_H

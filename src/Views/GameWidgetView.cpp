@@ -21,35 +21,29 @@ GameWidgetView::GameWidgetView(QWidget* parent)
     ui->coverLabel->setAlignment(Qt::AlignCenter);
 }
 
-GameWidgetView::~GameWidgetView()
-{
-    qDebug() << "GameWidgetView destroyed:" << this;
-}
+GameWidgetView::~GameWidgetView() = default;
 
 void GameWidgetView::setGame(const Game& game)
 {
     m_game = game;
-
-    // Set the title text
     ui->titleLabel->setText(game.title);
 
-    // Store and display cover image, preserving aspect ratio on resize
     m_originalCover = QPixmap();
-    if (m_originalCover.load(game.coverPath)) {
-        // Scale to current label width
-        int w = ui->coverLabel->width();
-        QPixmap scaled = m_originalCover.scaledToWidth(w, Qt::SmoothTransformation);
+    if (!game.coverPath.isEmpty())
+        m_originalCover.load(game.coverPath);
+
+    qreal dpr = 1.0;
+    if (auto* screen = QGuiApplication::primaryScreen())
+        dpr = screen->devicePixelRatio();
+
+    const int w = ui->coverLabel->width();
+    ui->coverLabel->setFixedHeight((w * 3) / 2);
+    if (!m_originalCover.isNull()) {
+        QPixmap scaled = m_originalCover.scaledToWidth(int(w * dpr), Qt::SmoothTransformation);
+        scaled.setDevicePixelRatio(dpr);
         ui->coverLabel->setPixmap(scaled);
-        ui->coverLabel->setFixedHeight((w * 3) / 2);
     } else {
-        // Draw placeholder using helper
-        qreal dpr = 1.0;
-        if (auto screen = QGuiApplication::primaryScreen())
-            dpr = screen->devicePixelRatio();
-        int width = ui->coverLabel->width();
-        QPixmap placeholder = PlaceholderImage::generate(width, dpr);
-        ui->coverLabel->setPixmap(placeholder);
-        ui->coverLabel->setFixedHeight((width * 3) / 2);
+        ui->coverLabel->setPixmap(PlaceholderImage::generate(w, dpr));
     }
 }
 
@@ -98,9 +92,10 @@ void GameWidgetView::setSelected(bool selected)
 {
     m_selected = selected;
     if (selected) {
-        this->setStyleSheet("border: 2px solid blue;");
+        const QColor c = palette().color(QPalette::Highlight);
+        setStyleSheet(QStringLiteral("GameWidgetView { border: 2px solid %1; }").arg(c.name()));
     } else {
-        this->setStyleSheet("");
+        setStyleSheet(QString());
     }
 }
 
@@ -128,24 +123,12 @@ void GameWidgetView::resizeEvent(QResizeEvent* event)
     QSize physSize(logicalWidth * dpr, logicalHeight * dpr);
 
     if (!m_originalCover.isNull()) {
-        // Scale original cover pixmap to physical size, preserving aspect
-        QPixmap scaled = m_originalCover.scaled(
-            physSize,
-            Qt::KeepAspectRatio,
-            Qt::SmoothTransformation
-        );
-        // Inform Qt this pixmap is high-DPI
+        QPixmap scaled = m_originalCover.scaled(physSize, Qt::KeepAspectRatio, Qt::SmoothTransformation);
         scaled.setDevicePixelRatio(dpr);
         ui->coverLabel->setPixmap(scaled);
     } else {
-        // Draw placeholder using helper
-        qreal dpr = 1.0;
-        if (auto screen = QGuiApplication::primaryScreen())
-            dpr = screen->devicePixelRatio();
-        int width = ui->coverLabel->width();
-        QPixmap placeholder = PlaceholderImage::generate(width, dpr);
+        QPixmap placeholder = PlaceholderImage::generate(logicalWidth, dpr);
         ui->coverLabel->setPixmap(placeholder);
-        ui->coverLabel->setFixedHeight((width * 3) / 2);
     }
 }
 
